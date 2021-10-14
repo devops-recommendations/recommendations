@@ -74,6 +74,7 @@ Vagrant.configure(2) do |config|
     
     # Need PostgreSQL development library to compile on arm64
     apt-get install -y libpq-dev
+    apt-get install -y lsof
 
     # Create a Python3 Virtual Environment and Activate it in .profile
     sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'
@@ -103,16 +104,6 @@ Vagrant.configure(2) do |config|
     sleep 60
     echo "Creating test database"
     docker exec postgres psql -c "create database testdb;" -U postgres
-    # Done
-  SHELL
-
-  ######################################################################
-  # Start flask app
-  ######################################################################
-  config.vm.provision "shell", inline: <<-SHELL
-    # Start the flask app
-    echo "Attempting to start the flask app"
-    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && FLASK_APP=service:app flask run -h 0.0.0.0'
     # Done
   SHELL
 
