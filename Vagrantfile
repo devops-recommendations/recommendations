@@ -106,4 +106,14 @@ Vagrant.configure(2) do |config|
     # Done
   SHELL
 
+  ######################################################################
+  # Start flask app
+  ######################################################################
+  config.vm.provision "shell", inline: <<-SHELL
+    # Start the flask app
+    echo "Attempting to start the flask app"
+    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && FLASK_APP=service:app flask run -h 0.0.0.0'
+    # Done
+  SHELL
+
 end
