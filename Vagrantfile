@@ -1,17 +1,13 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-############################################################
-# NYU: CSCI-GA.2820-001 DevOps and Agile Methodologies 
-# Instructor: John Rofrano
-############################################################
 Vagrant.configure(2) do |config|
   # config.vm.box = "ubuntu/focal64"
   config.vm.box = "bento/ubuntu-21.04"
   config.vm.hostname = "ubuntu"
 
   # set up network ip and port forwarding
-  config.vm.network "forwarded_port", guest: 5000, host: 5005, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
   config.vm.network "private_network", ip: "192.168.33.10"
 
   # Windows users need to change the permission of files and directories
