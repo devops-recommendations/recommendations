@@ -5,17 +5,14 @@ This module creates and configures the Flask app and sets up the logging
 and SQL database
 """
 import logging
-import os
 
 from flask import Flask
 
 # Create Flask application
 app = Flask(__name__)
 app.config.from_object("config")
-DEBUG = os.getenv("DEBUG", "False") == "True"
-PORT = os.getenv("PORT", "5000")
 
-# Import the rutes After the Flask app is created
+# Import the routes After the Flask app is created
 from service import routes, models, error_handlers
 
 # Set up logging for production
