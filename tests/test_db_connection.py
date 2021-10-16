@@ -25,7 +25,7 @@ DATABASE_URI = os.getenv(
 class TestDBConnection(unittest.TestCase):
     """Test Cases for DB Connection"""
 
-    app:Flask=None
+    app:Flask= None
 
     @classmethod
     def setUpClass(cls):
