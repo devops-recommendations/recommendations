@@ -31,6 +31,7 @@ def init_db(app):
     """Initialies the SQLAlchemy app"""
     Recommendation.init_db(app)
 
+
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
 
@@ -45,6 +46,7 @@ class RecommendationType(Enum):
     UpSell = 3
     Complementary = 4
 
+
 class Recommendation(db.Model):
     """
     Class that represents a Recommendation
@@ -53,7 +55,7 @@ class Recommendation(db.Model):
     from us by SQLAlchemy's object relational mappings (ORM)
     """
 
-    app:Flask=None
+    app: Flask = None
 
     ##################################################
     # Table Schema
@@ -102,7 +104,7 @@ class Recommendation(db.Model):
             "id": self.id,
             "query_prod_id": self.query_prod_id,
             "rec_prod_id": self.rec_prod_id,
-            "type": self.type
+            "type": self.type.name,  # convert enum to string
         }
 
     def deserialize(self, data: dict):
@@ -115,17 +117,21 @@ class Recommendation(db.Model):
             if isinstance(data['query_prod_id'], int):
                 self.query_prod_id = data["query_prod_id"]
             else:
-                raise DataValidationError("Invalid Query Product ID: " + data['query_prod_id'])    
+                raise DataValidationError(
+                    "Invalid Query Product ID: " + data['query_prod_id'])
             if isinstance(data['rec_prod_id'], int):
                 self.rec_prod_id = data["rec_prod_id"]
             else:
-                raise DataValidationError("Invalid Query Product ID: " + data['query_prod_id'])  
+                raise DataValidationError(
+                    "Invalid Query Product ID: " + data['query_prod_id'])
             self.type = getattr(RecommendationType, data["type"])
 
         except AttributeError as error:
-            raise DataValidationError("Invalid Recommendation Type: " + error.args[0])
+            raise DataValidationError(
+                "Invalid Recommendation Type: " + error.args[0])
         except KeyError as error:
-            raise DataValidationError("Invalid Recommendation: missing " + error.args[0])
+            raise DataValidationError(
+                "Invalid Recommendation: missing " + error.args[0])
         except TypeError as error:
             raise DataValidationError(
                 "Invalid Recommendation: body of request contained bad or no data"
@@ -137,7 +143,7 @@ class Recommendation(db.Model):
     ##################################################
 
     @classmethod
-    def init_db(cls, app:Flask):
+    def init_db(cls, app: Flask):
         """Initializes the database session
 
         :param app: the Flask app
@@ -158,7 +164,7 @@ class Recommendation(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, rec_id:int):
+    def find(cls, rec_id: int):
         """Finds a Recommendation by it's ID
 
         :param rec_id: the id of the Recommendation to find
@@ -172,7 +178,7 @@ class Recommendation(db.Model):
         return cls.query.get(rec_id)
 
     @classmethod
-    def find_or_404(cls, rec_id:int):
+    def find_or_404(cls, rec_id: int):
         """Find a Recommendation by it's id
 
         :param rec_id: the id of the rec to find
@@ -186,7 +192,7 @@ class Recommendation(db.Model):
         return cls.query.get_or_404(rec_id)
 
     @classmethod
-    def find_by_type(cls, type:str) -> list:
+    def find_by_type(cls, type: str) -> list:
         """Returns all of the Recommendation of a type
         :param category: the category of the Recommendations you want to match
         :type type: RecommendationType
@@ -197,7 +203,7 @@ class Recommendation(db.Model):
         return cls.query.filter(cls.type == type)
 
     @classmethod
-    def find_by_query_prod_id(cls, query_prod_id:int) -> list:
+    def find_by_query_prod_id(cls, query_prod_id: int) -> list:
         """Returns all Recommendations for a given product
 
         :param prod_id: the prod_id of Query Product whose Recommendations you want
@@ -207,9 +213,9 @@ class Recommendation(db.Model):
         :rtype: list
 
         """
-        logger.info("Processing find product recommendation query for %s ...", query_prod_id)
+        logger.info(
+            "Processing find product recommendation query for %s ...", query_prod_id)
         return cls.query.filter(cls.query_prod_id == query_prod_id)
-
 
     @classmethod
     def find_by_query_prod_id_and_type(cls, query_prod_id: int, type: RecommendationType = RecommendationType.Generic) -> list:
@@ -226,11 +232,12 @@ class Recommendation(db.Model):
         :rtype: list
 
         """
-        logger.info("Processing prod_id and type query for %s %s...", query_prod_id, type.name)
+        logger.info("Processing prod_id and type query for %s %s...",
+                    query_prod_id, type.name)
         return cls.query.filter(cls.query_prod_id == query_prod_id, cls.type == type)
 
     @classmethod
-    def find_by_rec_prod_id(cls, rec_prod_id:int) -> list:
+    def find_by_rec_prod_id(cls, rec_prod_id: int) -> list:
         """Returns all Recommendations for a given product
 
         :param prod_id: the prod_id of a Recommendation Product which are recommended to other products
@@ -240,7 +247,8 @@ class Recommendation(db.Model):
         :rtype: list
 
         """
-        logger.info("Processing find recommendation product query for %s ...", rec_prod_id)
+        logger.info(
+            "Processing find recommendation product query for %s ...", rec_prod_id)
         return cls.query.filter(cls.rec_prod_id == rec_prod_id)
 
     @classmethod
@@ -258,5 +266,6 @@ class Recommendation(db.Model):
         :rtype: list
 
         """
-        logger.info("Processing find recommendation products of a type query for %s %s...", rec_prod_id, type.name)
+        logger.info(
+            "Processing find recommendation products of a type query for %s %s...", rec_prod_id, type.name)
         return cls.query.filter(cls.rec_prod_id == rec_prod_id, cls.type == type)
