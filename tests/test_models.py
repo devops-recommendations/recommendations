@@ -101,6 +101,21 @@ class TestRecommendationModel(unittest.TestCase):
         self.assertEqual(recs[0].id, 1)
         self.assertEqual(recs[0].rec_prod_id, 201)
 
+    def test_bad_update(self):
+        """Test error on invalid update"""
+        rec = RecommendationFactory()
+        logging.debug(rec)
+        rec.create()
+        self.assertEqual(rec.id, 1)
+        rec.id = None
+        # try:
+        self.assertRaises(DataValidationError, rec.update)
+        # except Exception as e:
+        #     print (e)
+        #     self.assertEqual(e, DataValidationError)
+            
+    
+
     def test_delete_a_recommendation(self):
         """Delete a Recommendation"""
         rec = RecommendationFactory()
@@ -216,6 +231,7 @@ class TestRecommendationModel(unittest.TestCase):
         Recommendation(query_prod_id=1, rec_prod_id=4, type=RecommendationType.Generic).create()
         
         res = Recommendation.get_by_prod_id_and_type(1, RecommendationType.UpSell)
+        # print (recs)
         recs = [rec for rec in res]
         # print (rec, rec[0])
         self.assertEqual(recs[0].query_prod_id, 1)
@@ -238,3 +254,9 @@ class TestRecommendationModel(unittest.TestCase):
     def test_find_or_404_not_found(self):
         """Find or return 404 NOT found"""
         self.assertRaises(NotFound, Recommendation.find_or_404, 0)
+
+    def test_result_string_conversion(self):
+        out = repr(Recommendation(query_prod_id=1, rec_prod_id=2, type=RecommendationType.UpSell))
+        # print (out)
+
+        self.assertEqual(out, "<Recommendation of prod=[1] is prod=[2] with id=[None] in table>")

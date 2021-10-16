@@ -31,7 +31,6 @@ def init_db(app):
     """Initialies the SQLAlchemy app"""
     Recommendation.init_db(app)
 
-
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
 
