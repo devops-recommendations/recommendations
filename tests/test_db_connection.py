@@ -46,7 +46,7 @@ class TestDBConnection(unittest.TestCase):
         self.app = app.test_client()
 
     def tearDown(self):
-        pass
+        db.session.remove()
     
     def test_connection(self):
         """Test to check if DB is alive"""        
