@@ -133,3 +133,6 @@ dmypy.json
 
 #Idea folder
 .idea
+
+#unittests
+unittests.xml
