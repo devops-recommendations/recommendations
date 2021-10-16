@@ -7,13 +7,13 @@ All of the models are stored in this module
 
 Models
 ------
-Pet - A Pet used in the Pet Store
+Recommendation - A table that contains product recommendations for given product
 
 Attributes:
 -----------
-query_prod_id (string) - the name of the pet
- (string) - the category the pet belongs to (i.e., dog, cat)
-available (boolean) - True for pets that are available for adoption
+query_prod_id (int) - the id of the query product
+rec_prod_id (int) - the id of the recommended product
+type (RecommendationType) - the type of the recommendation
 
 """
 import logging
@@ -60,8 +60,8 @@ class Recommendation(db.Model):
     # Table Schema
     ##################################################
     id = db.Column(db.Integer, primary_key=True)
-    query_prod_id = db.Column(db.String(63), nullable=False)
-    rec_prod_id = db.Column(db.String(63), nullable=False)
+    query_prod_id = db.Column(db.Integer, nullable=False)
+    rec_prod_id = db.Column(db.Integer, nullable=False)
     type = db.Column(
         db.Enum(RecommendationType), nullable=False, server_default=(RecommendationType.Generic.name)
     )
@@ -77,7 +77,7 @@ class Recommendation(db.Model):
         """
         Creates a Recommendation in the database
         """
-        logger.info("Creating %s", self.name)
+        logger.info("Creating %s", self.id)
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
@@ -86,14 +86,14 @@ class Recommendation(db.Model):
         """
         Updates a Recommendation to the database
         """
-        logger.info("Saving %s", self.name)
+        logger.info("Saving %s", self.id)
         if not self.id:
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):
         """Removes a Recommendation from the data store"""
-        logger.info("Deleting %s", self.name)
+        logger.info("Deleting %s", self.id)
         db.session.delete(self)
         db.session.commit()
 
@@ -197,7 +197,7 @@ class Recommendation(db.Model):
         :rtype: list
 
         """
-        logger.info("Processing name query for %s ...", query_prod_id)
+        logger.info("Processing get product recommendation query for %s ...", query_prod_id)
         return cls.query.filter(cls.query_prod_id == query_prod_id)
 
     @classmethod

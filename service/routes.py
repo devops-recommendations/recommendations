@@ -6,7 +6,7 @@ Paths:
 GET / - Root Resource
 """
 
-from flask import jsonify
+from flask import jsonify, request, url_for, make_response, abort
 
 # Import Flask application
 from . import app
@@ -25,7 +25,7 @@ def index():
             name="Recommendation REST API Service",
             version="1.0",
             description="The recommendations resource can be used to get a product recommendation based on another product.",
-            paths=[url_for("list_recommendations", _external=True)],
+            paths=[],
         ),
         status.HTTP_200_OK,
     )

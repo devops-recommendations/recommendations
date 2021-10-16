@@ -8,6 +8,7 @@ While debugging just these tests it's convinient to use this:
 """
 import os
 import logging
+from types import resolve_bases
 import unittest
 from werkzeug.exceptions import NotFound
 from service.models import Recommendation, RecommendationType, DataValidationError, db
@@ -64,7 +65,7 @@ class TestRecommendationModel(unittest.TestCase):
         rec = Recommendation(query_prod_id=1, rec_prod_id=5, type=RecommendationType.UpSell)
         self.assertEqual(rec.query_prod_id, 1)
         self.assertEqual(rec.rec_prod_id, 5)
-        self.assertEqual(rec.type, RecommendationType.Generic)
+        self.assertEqual(rec.type, RecommendationType.UpSell)
         
 
     def test_add_a_recommendation(self):
@@ -102,9 +103,9 @@ class TestRecommendationModel(unittest.TestCase):
 
     def test_delete_a_recommendation(self):
         """Delete a Recommendation"""
-        rec = RecommendationFactory
+        rec = RecommendationFactory()
         rec.create()
-        self.assertEqual(len(RecommendationFactory.all()), 1)
+        self.assertEqual(len(Recommendation.all()), 1)
         
         rec.delete()
         self.assertEqual(len(Recommendation.all()), 0)
@@ -122,7 +123,7 @@ class TestRecommendationModel(unittest.TestCase):
         self.assertIn("rec_prod_id", data)
         self.assertEqual(data["rec_prod_id"], rec.rec_prod_id)
         self.assertIn("type", data)
-        self.assertEqual(data["type"], rec.type.name)
+        self.assertEqual(data["type"], rec.type)
 
     def test_deserialize_a_recommendation(self):
         """Test deserialization of a Recommendation"""
@@ -196,25 +197,30 @@ class TestRecommendationModel(unittest.TestCase):
 
     def test_get_by_prod_id(self):
         """Get Recommedations by Product ID"""
-        rec = Recommendation(query_prod_id=1, rec_prod_id=5, type=RecommendationType.UpSell)
-        rec.create()
+        Recommendation(query_prod_id=1, rec_prod_id=5, type=RecommendationType.Generic).create()
+        Recommendation(query_prod_id=1, rec_prod_id=10, type=RecommendationType.UpSell).create()
+        Recommendation(query_prod_id=2, rec_prod_id=5, type=RecommendationType.CrossSell).create()
 
-        rec = Recommendation.get_by_prod_id(1)
+        res = Recommendation.get_by_prod_id(2)
+        recs = [rec for rec in res]
         
-        self.assertEqual(rec.query_prod_id, 1)
-        self.assertEqual(rec.rec_prod_id, 5)
-        self.assertEqual(rec.type, RecommendationType.UpSell)
+        self.assertEqual(recs[0].query_prod_id, 2)
+        self.assertEqual(recs[0].rec_prod_id, 5)
+        self.assertEqual(recs[0].type, RecommendationType.CrossSell)
 
     def test_get_by_prod_id_and_type(self):
         """Get Recommedations by Product ID and Type"""
-        rec = Recommendation(query_prod_id=1, rec_prod_id=5, type=RecommendationType.UpSell)
-        rec.create()
-
-        rec = Recommendation.get_by_prod_id_and_type(1, RecommendationType.UpSell)
         
-        self.assertEqual(rec.query_prod_id, 1)
-        self.assertEqual(rec.rec_prod_id, 5)
-        self.assertEqual(rec.type, RecommendationType.UpSell.name)
+        Recommendation(query_prod_id=1, rec_prod_id=2, type=RecommendationType.UpSell).create()
+        Recommendation(query_prod_id=1, rec_prod_id=3, type=RecommendationType.UpSell).create()
+        Recommendation(query_prod_id=1, rec_prod_id=4, type=RecommendationType.Generic).create()
+        
+        res = Recommendation.get_by_prod_id_and_type(1, RecommendationType.UpSell)
+        recs = [rec for rec in res]
+        # print (rec, rec[0])
+        self.assertEqual(recs[0].query_prod_id, 1)
+        self.assertEqual(recs[0].rec_prod_id, 2)
+        self.assertEqual(recs[0].type, RecommendationType.UpSell)
 
     def test_find_or_404_found(self):
         """Find or return 404 found"""
