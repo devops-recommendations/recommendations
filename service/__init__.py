@@ -19,15 +19,12 @@ from service import routes, models, error_handlers
 print("Setting up logging for {}...".format(__name__))
 app.logger.propagate = False
 if __name__ != "__main__":
-    gunicorn_logger = logging.getLogger("gunicorn.error")
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
-    # Make all log formats consistent
+    
     formatter = logging.Formatter(
         "[%(asctime)s] [%(levelname)s] [%(module)s] %(message)s", "%Y-%m-%d %H:%M:%S %z"
     )
-    for handler in app.logger.handlers:
-        handler.setFormatter(formatter)
+    # for handler in app.logger.handlers:
+    #     handler.setFormatter(formatter)
     app.logger.info("Logging handler established")
 
 app.logger.info(70 * "*")
