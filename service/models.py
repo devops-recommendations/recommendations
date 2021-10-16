@@ -38,12 +38,12 @@ class DataValidationError(Exception):
 
 
 class RecommendationType(Enum):
-    """Enumeration of valid Pet Genders"""
+    """Enumeration of valid Recommendation Types"""
     Generic = 0
     BoughtTogether = 1
-    Complementary = 4
     CrossSell = 2
     UpSell = 3
+    Complementary = 4
 
 class Recommendation(db.Model):
     """
@@ -186,7 +186,18 @@ class Recommendation(db.Model):
         return cls.query.get_or_404(rec_id)
 
     @classmethod
-    def get_by_prod_id(cls, query_prod_id:int) -> list:
+    def find_by_type(cls, type:str) -> list:
+        """Returns all of the Recommendation of a type
+        :param category: the category of the Recommendations you want to match
+        :type type: RecommendationType
+        :return: a collection of Recommendation of that type
+        :rtype: list
+        """
+        logger.info("Processing type query for %s ...", type)
+        return cls.query.filter(cls.type == type)
+
+    @classmethod
+    def find_by_query_prod_id(cls, query_prod_id:int) -> list:
         """Returns all Recommendations for a given product
 
         :param prod_id: the prod_id of Query Product whose Recommendations you want
@@ -196,11 +207,12 @@ class Recommendation(db.Model):
         :rtype: list
 
         """
-        logger.info("Processing get product recommendation query for %s ...", query_prod_id)
+        logger.info("Processing find product recommendation query for %s ...", query_prod_id)
         return cls.query.filter(cls.query_prod_id == query_prod_id)
 
+
     @classmethod
-    def get_by_prod_id_and_type(cls, query_prod_id: int, type: RecommendationType = RecommendationType.Generic) -> list:
+    def find_by_query_prod_id_and_type(cls, query_prod_id: int, type: RecommendationType = RecommendationType.Generic) -> list:
         """Returns all of the Recommendations for query product of a given type
 
         :param 
@@ -210,9 +222,41 @@ class Recommendation(db.Model):
             query_prod_id: int
             type: RecommendationType
 
-        :return: a collection of Recommendations for query_prod_id and of type
+        :return: a collection of Recommendations for query_prod_id and type
         :rtype: list
 
         """
         logger.info("Processing prod_id and type query for %s %s...", query_prod_id, type.name)
         return cls.query.filter(cls.query_prod_id == query_prod_id, cls.type == type)
+
+    @classmethod
+    def find_by_rec_prod_id(cls, rec_prod_id:int) -> list:
+        """Returns all Recommendations for a given product
+
+        :param prod_id: the prod_id of a Recommendation Product which are recommended to other products
+        :type prod_id: int
+
+        :return: a collection of Recommendations for a given rec_prod_id
+        :rtype: list
+
+        """
+        logger.info("Processing find recommendation product query for %s ...", rec_prod_id)
+        return cls.query.filter(cls.rec_prod_id == rec_prod_id)
+
+    @classmethod
+    def find_by_rec_prod_id_and_type(cls, rec_prod_id: int, type: RecommendationType = RecommendationType.Generic) -> list:
+        """Returns all of the Recommendations for recommended product of a given type
+
+        :param 
+            rec_prod_id: the product_id of a recommended product (cls.rec_prod_id)
+            type: the type of the recommendation entries you want to retrieve
+        :type 
+            rec_prod_id: int
+            type: RecommendationType
+
+        :return: a collection of Recommendations for rec_prod_id and type
+        :rtype: list
+
+        """
+        logger.info("Processing find recommendation products of a type query for %s %s...", rec_prod_id, type.name)
+        return cls.query.filter(cls.rec_prod_id == rec_prod_id, cls.type == type)

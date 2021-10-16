@@ -108,13 +108,12 @@ class TestRecommendationModel(unittest.TestCase):
         rec.create()
         self.assertEqual(rec.id, 1)
         rec.id = None
-        # try:
         self.assertRaises(DataValidationError, rec.update)
-        # except Exception as e:
-        #     print (e)
-        #     self.assertEqual(e, DataValidationError)
-            
-    
+
+    def test_result_string_conversion(self):
+        """Test printable representation of Recommendation Model"""
+        out = repr(Recommendation(query_prod_id=1, rec_prod_id=2, type=RecommendationType.UpSell))
+        self.assertEqual(out, "<Recommendation of prod=[1] is prod=[2] with id=[None] in table>")
 
     def test_delete_a_recommendation(self):
         """Delete a Recommendation"""
@@ -210,34 +209,6 @@ class TestRecommendationModel(unittest.TestCase):
         self.assertEqual(rec.rec_prod_id, recs[1].rec_prod_id)
         self.assertEqual(rec.type, recs[1].type)
 
-    def test_get_by_prod_id(self):
-        """Get Recommedations by Product ID"""
-        Recommendation(query_prod_id=1, rec_prod_id=5, type=RecommendationType.Generic).create()
-        Recommendation(query_prod_id=1, rec_prod_id=10, type=RecommendationType.UpSell).create()
-        Recommendation(query_prod_id=2, rec_prod_id=5, type=RecommendationType.CrossSell).create()
-
-        res = Recommendation.get_by_prod_id(2)
-        recs = [rec for rec in res]
-        
-        self.assertEqual(recs[0].query_prod_id, 2)
-        self.assertEqual(recs[0].rec_prod_id, 5)
-        self.assertEqual(recs[0].type, RecommendationType.CrossSell)
-
-    def test_get_by_prod_id_and_type(self):
-        """Get Recommedations by Product ID and Type"""
-        
-        Recommendation(query_prod_id=1, rec_prod_id=2, type=RecommendationType.UpSell).create()
-        Recommendation(query_prod_id=1, rec_prod_id=3, type=RecommendationType.UpSell).create()
-        Recommendation(query_prod_id=1, rec_prod_id=4, type=RecommendationType.Generic).create()
-        
-        res = Recommendation.get_by_prod_id_and_type(1, RecommendationType.UpSell)
-        # print (recs)
-        recs = [rec for rec in res]
-        # print (rec, rec[0])
-        self.assertEqual(recs[0].query_prod_id, 1)
-        self.assertEqual(recs[0].rec_prod_id, 2)
-        self.assertEqual(recs[0].type, RecommendationType.UpSell)
-
     def test_find_or_404_found(self):
         """Find or return 404 found"""
         recs = RecommendationFactory.create_batch(3)
@@ -255,8 +226,68 @@ class TestRecommendationModel(unittest.TestCase):
         """Find or return 404 NOT found"""
         self.assertRaises(NotFound, Recommendation.find_or_404, 0)
 
-    def test_result_string_conversion(self):
-        out = repr(Recommendation(query_prod_id=1, rec_prod_id=2, type=RecommendationType.UpSell))
-        # print (out)
+    def test_find_by_type(self):
+        """Find Recommedations by Recommendation Type"""
+        Recommendation(query_prod_id=1, rec_prod_id=5, type=RecommendationType.Generic).create()
+        Recommendation(query_prod_id=1, rec_prod_id=10, type=RecommendationType.Generic).create()
+        Recommendation(query_prod_id=2, rec_prod_id=5, type=RecommendationType.Generic).create()
 
-        self.assertEqual(out, "<Recommendation of prod=[1] is prod=[2] with id=[None] in table>")
+        res = Recommendation.find_by_type(RecommendationType.Generic)
+        recs = [rec for rec in res]
+
+        self.assertEqual(len(recs), 3)
+        self.assertEqual(recs[0].query_prod_id, 1)
+        self.assertEqual(recs[0].rec_prod_id, 5)
+        self.assertEqual(recs[0].type, RecommendationType.Generic)
+
+    def test_find_by_query_prod_id(self):
+        """Find Recommedations by Product ID"""
+        Recommendation(query_prod_id=1, rec_prod_id=5, type=RecommendationType.Generic).create()
+        Recommendation(query_prod_id=1, rec_prod_id=10, type=RecommendationType.UpSell).create()
+        Recommendation(query_prod_id=2, rec_prod_id=5, type=RecommendationType.CrossSell).create()
+
+        res = Recommendation.find_by_query_prod_id(2)
+        recs = [rec for rec in res]
+        
+        self.assertEqual(recs[0].query_prod_id, 2)
+        self.assertEqual(recs[0].rec_prod_id, 5)
+        self.assertEqual(recs[0].type, RecommendationType.CrossSell)
+
+
+    def test_find_by_rec_prod_id(self):
+        """Find Recommedations by Recommended Product ID"""
+        Recommendation(query_prod_id=1, rec_prod_id=5, type=RecommendationType.Generic).create()
+        Recommendation(query_prod_id=1, rec_prod_id=10, type=RecommendationType.UpSell).create()
+        Recommendation(query_prod_id=2, rec_prod_id=5, type=RecommendationType.CrossSell).create()
+
+        res = Recommendation.find_by_rec_prod_id(10)
+        recs = [rec for rec in res]
+        
+        self.assertEqual(recs[0].rec_prod_id, 10)
+        self.assertEqual(recs[0].type, RecommendationType.UpSell)
+
+    def test_find_by_query_prod_id_and_type(self):
+        """Find Recommedations by Product ID and Type"""
+        
+        Recommendation(query_prod_id=1, rec_prod_id=2, type=RecommendationType.UpSell).create()
+        Recommendation(query_prod_id=1, rec_prod_id=3, type=RecommendationType.UpSell).create()
+        Recommendation(query_prod_id=1, rec_prod_id=4, type=RecommendationType.Generic).create()
+        
+        res = Recommendation.find_by_query_prod_id_and_type(1, RecommendationType.UpSell)
+        recs = [rec for rec in res]
+        self.assertEqual(recs[0].query_prod_id, 1)
+        self.assertEqual(recs[0].rec_prod_id, 2)
+        self.assertEqual(recs[0].type, RecommendationType.UpSell)
+
+    def test_find_by_rec_prod_id_and_type(self):
+        """Find Recommedations by Recommended Product ID and Type"""
+        
+        Recommendation(query_prod_id=1, rec_prod_id=3, type=RecommendationType.UpSell).create()
+        Recommendation(query_prod_id=2, rec_prod_id=3, type=RecommendationType.UpSell).create()
+        Recommendation(query_prod_id=1, rec_prod_id=4, type=RecommendationType.Generic).create()
+        
+        res = Recommendation.find_by_rec_prod_id_and_type(3, RecommendationType.UpSell)
+        recs = [rec for rec in res]
+        
+        self.assertEqual(recs[0].rec_prod_id, 3)
+        self.assertEqual(recs[0].type, RecommendationType.UpSell)
