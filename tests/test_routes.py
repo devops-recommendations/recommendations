@@ -106,7 +106,8 @@ class TestYourResourceServer(unittest.TestCase):
         self.assertIsNotNone(location)
         # Check the data is correct
         new_rec = resp.get_json()
-        self.assertEqual(new_rec["query_prod_id"], test_rec.query_prod_id, "Query_prod_id do not match")
+        self.assertEqual(
+            new_rec["query_prod_id"], test_rec.query_prod_id, "Query_prod_id do not match")
         self.assertEqual(
             new_rec["rec_prod_id"], test_rec.rec_prod_id, "Rec_prod do not match"
         )
@@ -117,7 +118,8 @@ class TestYourResourceServer(unittest.TestCase):
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_rec = resp.get_json()
-        self.assertEqual(new_rec[0]['query_prod_id'], test_rec.query_prod_id, "Query_prod_id do not match")
+        self.assertEqual(new_rec[0]['query_prod_id'],
+                         test_rec.query_prod_id, "Query_prod_id do not match")
         self.assertEqual(
             new_rec[0]["rec_prod_id"], test_rec.rec_prod_id, "Rec_prod do not match"
         )
@@ -140,3 +142,25 @@ class TestYourResourceServer(unittest.TestCase):
         """Get a Recommendation thats not found"""
         resp = self.app.get("/recommendations/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_recommendation(self):
+        """Update an existing Recommendation"""
+        # create a recommendation to update
+        test_recommendation = RecommendationFactory()
+        resp = self.app.post(
+            BASE_URL, json=test_recommendation.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the recommendation
+        new_recommendation = resp.get_json()
+        logging.debug(new_recommendation)
+        new_recommendation["query_prod_id"] = 5
+        resp = self.app.put(
+            "/recommendations/{}".format(new_recommendation["id"]),
+            json=new_recommendation,
+            content_type=CONTENT_TYPE_JSON,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_recommendation = resp.get_json()
+        self.assertEqual(updated_recommendation["query_prod_id"], 5)
