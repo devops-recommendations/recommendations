@@ -5,15 +5,22 @@ Paths:
 ------
 GET / - Root Resource
 GET /recommendations - Return a list of all recommendations for all products
+POST /recommendation - Add a recommendation for products
 """
-
+import os
+import sys
+import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
-
-from service.models import Recommendation
+from . import status  # HTTP Status Codes
 from werkzeug.exceptions import NotFound
+
+# For this example we'll use SQLAlchemy, a popular ORM that supports a
+# variety of backends including SQLite, MySQL, and PostgreSQL
+from flask_sqlalchemy import SQLAlchemy
+from service.models import Recommendation, DataValidationError
+
 # Import Flask application
 from . import app
-from . import status  # HTTP Status Codes
 
 
 ######################################################################
@@ -49,3 +56,42 @@ def list_recommendations():
                for recommendation in recommendations]
     app.logger.info("Returning %d recommendations", len(results))
     return make_response(jsonify(results), status.HTTP_200_OK)
+
+######################################################################
+# CREATE A RECOMMENDATION
+######################################################################
+
+@app.route("/recommendations", methods=["POST"])
+def create_recommendation():
+    """
+    Creates a Recommendation
+    This endpoint will create a Recommendation based the data in the body that is posted
+    """
+    app.logger.info("Request to create a recommendation")
+    check_content_type("application/json")
+    recommendation = Recommendation()
+    recommendation.deserialize(request.get_json())
+    recommendation.create()
+    message = recommendation.serialize()
+    location_url = url_for("list_recommendations", rec_id=recommendation.id, _external=True)
+
+    app.logger.info("Recommendation with ID [%s] created.", recommendation.id)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
+
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+def check_content_type(media_type):
+    """Checks that the media type is correct"""
+    content_type = request.headers.get("Content-Type")
+    if content_type and content_type == media_type:
+        return
+    app.logger.error("Invalid Content-Type: %s", content_type)
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        "Content-Type must be {}".format(media_type),
+    )

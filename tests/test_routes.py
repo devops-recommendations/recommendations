@@ -92,3 +92,35 @@ class TestYourResourceServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)
+
+    def test_create_recommendation(self):
+        """Create a new Recommendation"""
+        test_rec = RecommendationFactory()
+        logging.debug(test_rec)
+        resp = self.app.post(
+            BASE_URL, json=test_rec.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+        # Check the data is correct
+        new_rec = resp.get_json()
+        self.assertEqual(new_rec["query_prod_id"], test_rec.query_prod_id, "Query_prod_id do not match")
+        self.assertEqual(
+            new_rec["rec_prod_id"], test_rec.rec_prod_id, "Rec_prod do not match"
+        )
+        self.assertEqual(
+            new_rec["type"], test_rec.type.name, "Type does not match"
+        )
+        # Check that the location header was correct
+        resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_rec = resp.get_json()
+        self.assertEqual(new_rec[0]['query_prod_id'], test_rec.query_prod_id, "Query_prod_id do not match")
+        self.assertEqual(
+            new_rec[0]["rec_prod_id"], test_rec.rec_prod_id, "Rec_prod do not match"
+        )
+        self.assertEqual(
+            new_rec[0]["type"], test_rec.type.name, "Type does not match"
+        )
