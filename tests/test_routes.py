@@ -124,3 +124,19 @@ class TestYourResourceServer(unittest.TestCase):
         self.assertEqual(
             new_rec[0]["type"], test_rec.type.name, "Type does not match"
         )
+
+    def test_get_recommendation(self):
+        """Get a single recommendation"""
+        # get the id of a recommendation
+        test_rec = self._create_recommendations(1)[0]
+        resp = self.app.get(
+            "/recommendations/{}".format(test_rec.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["query_prod_id"], test_rec.query_prod_id)
+
+    def test_get_recommendation_not_found(self):
+        """Get a Recommendation thats not found"""
+        resp = self.app.get("/recommendations/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
