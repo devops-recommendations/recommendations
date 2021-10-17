@@ -143,6 +143,20 @@ class TestYourResourceServer(unittest.TestCase):
         resp = self.app.get("/recommendations/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_delete_recommendation(self):
+        """Delete a Recommendation"""
+        test_recommendation = self._create_recommendations(1)[0]
+        resp = self.app.delete(
+            "{0}/{1}".format(BASE_URL, test_recommendation.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get(
+            "{0}/{1}".format(BASE_URL, test_recommendation.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_update_recommendation(self):
         """Update an existing Recommendation"""
         # create a recommendation to update
