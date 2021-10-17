@@ -7,6 +7,7 @@ and SQL database
 import logging
 
 from flask import Flask
+import sys
 
 # Create Flask application
 app = Flask(__name__)
@@ -30,3 +31,12 @@ if __name__ != "__main__":
 app.logger.info(70 * "*")
 app.logger.info("=====   RECOMMENDATION SERVICE   =====".center(70, "*"))
 app.logger.info(70 * "*")
+
+try:
+    models.init_db(app)  # make our sqlalchemy tables
+except Exception as error:
+    app.logger.critical("%s: Cannot continue", error)
+    # gunicorn requires exit code 4 to stop spawning workers when they die
+    sys.exit(4)
+
+app.logger.info("Service inititalized!")
