@@ -80,6 +80,22 @@ def create_recommendation():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+######################################################################
+# RETRIEVE A RECOMMENDATION
+######################################################################
+@app.route("/recommendations/<int:rec_id>", methods=["GET"])
+def get_recommendations(rec_id):
+    """
+    Retrieve a single Recommendation
+    This endpoint will return a Recommendation based on it's id
+    """
+    app.logger.info("Request for recommendation with id: %s", rec_id)
+    recommendation = Recommendation.find(rec_id)
+    if not recommendation:
+        raise NotFound("Recommendation with id '{}' was not found.".format(rec_id))
+
+    app.logger.info("Returning recommendation: %s", recommendation.id)
+    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
