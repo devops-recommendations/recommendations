@@ -7,10 +7,11 @@ Test cases can be run with the following:
 import os
 import logging
 import unittest
+from unittest import mock
 
 from urllib.parse import quote_plus
 from service import status  # HTTP Status Codes
-from service.models import db, init_db
+from service.models import db, init_db, DataValidationError
 from service.routes import app
 from .factories import RecommendationFactory
 
@@ -178,3 +179,21 @@ class TestYourResourceServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_recommendation = resp.get_json()
         self.assertEqual(updated_recommendation["query_prod_id"], 5)
+
+    def test_create_recommendation_bad_type(self):
+        """ Create a recommendation with bad type data """
+        recommendation = RecommendationFactory()
+        logging.debug(recommendation)
+        # change type to a bad string
+        test_recommendation = recommendation.serialize()
+        test_recommendation["type"] = "no_such_type"    # wrong type
+        resp = self.app.post(
+            BASE_URL, json=test_recommendation, content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_recommendation_no_content_type(self):
+        """Create a recommendation with no content type"""
+        resp = self.app.post(BASE_URL)
+        self.assertEqual(resp.status_code,
+                         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
