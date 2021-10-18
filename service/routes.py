@@ -98,6 +98,7 @@ def get_recommendations(rec_id):
     if not recommendation:
         raise NotFound(
             "Recommendation with id '{}' was not found.".format(rec_id))
+        return make_response(jsonify(recommendation.serialize()), status.HTTP_400_BAD_REQUEST)
 
     app.logger.info("Returning recommendation: %s", recommendation.id)
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
@@ -105,6 +106,8 @@ def get_recommendations(rec_id):
 ######################################################################
 # DELETE A RECOMMENDATION
 ######################################################################
+
+
 @app.route("/recommendations/<int:rec_id>", methods=["DELETE"])
 def delete_recommendations(rec_id):
     """
@@ -118,7 +121,7 @@ def delete_recommendations(rec_id):
 
     app.logger.info("Recommendation with ID [%s] delete complete.", rec_id)
     return make_response("", status.HTTP_204_NO_CONTENT)
-  
+
 ######################################################################
 # UPDATE AN EXISTING RECOMMENDATION
 ######################################################################
