@@ -44,7 +44,7 @@ Vagrantfile                 - sample Vagrant file that installs Python 3 and Pos
    port `5000`.
 
 - Server logs will be output in the same terminal window.
-- You can test the service by executing `curl 127.0.0.1/5000` from your shell/terminal.
+- You can check that the service is up and running by executing `curl -X GET http://localhost:5000` from your local shell/terminal.
 
 ## Testing the service
 
