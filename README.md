@@ -31,6 +31,18 @@ tests/                      - test cases package
 Vagrantfile                 - sample Vagrant file that installs Python 3 and PostgreSQL
 ```
 
+## Models
+
+This section documents the different data models the service employs.  
+
+####1. Recommendation
+```text
+id: Integer, primary key
+query_prod_id: Integer
+rec_prod_id: Integer
+type = <Generic, BoughtTogether, CossSell, UpSell, Complementary>
+```
+
 ## Dev Setup
 
 1. Clone the repo.
