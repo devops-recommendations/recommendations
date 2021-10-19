@@ -53,7 +53,7 @@ type = <Generic, BoughtTogether, CossSell, UpSell, Complementary>
 4. After this, you will find a vm / docker container running on your system, inside which a docker container running
    postgres.
 5. To start the flask app, run `./scripts/start.sh` from the project directory. This will start the flask app on
-   port `5000`.
+   port `5000` in the vm. 
 
 - Server logs will be output in the same terminal window.
 - You can check that the service is up and running by executing `curl -X GET http://localhost:5000` from your local shell/terminal.
