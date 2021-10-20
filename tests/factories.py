@@ -12,7 +12,7 @@ class RecommendationFactory(factory.Factory):
 
     class Meta:
         model = Recommendation
-    
+
     id = factory.Sequence(lambda n: n)
     query_prod_id = FuzzyChoice(choices=[i for i in range(100)])
     rec_prod_id = FuzzyChoice(choices=[i for i in range(100, 200)])
