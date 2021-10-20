@@ -20,7 +20,6 @@ from service import routes, models, error_handlers
 print("Setting up logging for {}...".format(__name__))
 app.logger.propagate = False
 if __name__ != "__main__":
-    
     formatter = logging.Formatter(
         "[%(asctime)s] [%(levelname)s] [%(module)s] %(message)s", "%Y-%m-%d %H:%M:%S %z"
     )

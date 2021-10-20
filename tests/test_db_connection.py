@@ -22,10 +22,11 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/testdb"
 )
 
+
 class TestDBConnection(unittest.TestCase):
     """Test Cases for DB Connection"""
 
-    app:Flask= None
+    app: Flask = None
 
     @classmethod
     def setUpClass(cls):
@@ -47,15 +48,10 @@ class TestDBConnection(unittest.TestCase):
 
     def tearDown(self):
         db.session.remove()
-    
+
     def test_connection(self):
-        """Test to check if DB is alive"""        
+        """Test to check if DB is alive"""
         db.init_app(app)
         app.app_context().push()
-        
-        self.assertEquals(db.drop_all(), None)
 
-        
-        
-        
-    
+        self.assertEquals(db.drop_all(), None)

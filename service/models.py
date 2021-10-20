@@ -221,10 +221,10 @@ class Recommendation(db.Model):
     def find_by_query_prod_id_and_type(cls, query_prod_id: int, type: RecommendationType = RecommendationType.Generic) -> list:
         """Returns all of the Recommendations for query product of a given type
 
-        :param 
+        :param
             query_prod_id: the product_id of the product for which you want recommendations
             type: the type of the recommendation you want to retrieve
-        :type 
+        :type
             query_prod_id: int
             type: RecommendationType
 
@@ -255,10 +255,10 @@ class Recommendation(db.Model):
     def find_by_rec_prod_id_and_type(cls, rec_prod_id: int, type: RecommendationType = RecommendationType.Generic) -> list:
         """Returns all of the Recommendations for recommended product of a given type
 
-        :param 
+        :param
             rec_prod_id: the product_id of a recommended product (cls.rec_prod_id)
             type: the type of the recommendation entries you want to retrieve
-        :type 
+        :type
             rec_prod_id: int
             type: RecommendationType
 
