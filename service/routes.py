@@ -98,7 +98,6 @@ def get_recommendations(rec_id):
     if not recommendation:
         raise NotFound(
             "Recommendation with id '{}' was not found.".format(rec_id))
-        return make_response(jsonify(recommendation.serialize()), status.HTTP_400_BAD_REQUEST)
 
     app.logger.info("Returning recommendation: %s", recommendation.id)
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
@@ -162,3 +161,27 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         "Content-Type must be {}".format(media_type),
     )
+
+######################################################################
+#  Increment Interested Counter
+######################################################################
+
+
+@app.route('/recommendations/<int:rec_id>/interested', methods=["PUT"])
+def increment_interested_counter(rec_id):
+    """
+    Increment a recommendation's interesed field
+    This endpoint will increment the interested counter by one when interested button is clicked
+    """
+    app.logger.info(
+        'Increment intrested field for recommendation with id: %s', rec_id)
+    check_content_type('application/json')
+    recommendation = Recommendation.find(rec_id)
+    if not recommendation:
+        raise NotFound(
+            "Recommendation with id '{}' was not found.".format(rec_id))
+    count = recommendation.rec_interested
+    if count == None:
+        count = 0
+    recommendation.rec_interested = count + 1
+    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)

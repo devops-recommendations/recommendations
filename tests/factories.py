@@ -17,3 +17,4 @@ class RecommendationFactory(factory.Factory):
     query_prod_id = FuzzyChoice(choices=[i for i in range(100)])
     rec_prod_id = FuzzyChoice(choices=[i for i in range(100, 200)])
     type = FuzzyChoice(choices=list(RecommendationType))
+    rec_interested = 0
