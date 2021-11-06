@@ -269,3 +269,5 @@ class Recommendation(db.Model):
         logger.info(
             "Processing find recommendation products of a type query for %s %s...", rec_prod_id, type.name)
         return cls.query.filter(cls.rec_prod_id == rec_prod_id, cls.type == type)
+
+
