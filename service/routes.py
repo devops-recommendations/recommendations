@@ -167,7 +167,7 @@ def check_content_type(media_type):
 ######################################################################
 
 
-@app.route('/recommendations/<int:rec_id>/interested', methods=["POST"])
+@app.route('/recommendations/<int:rec_id>/interested', methods=["PUT"])
 def increment_interested_counter(rec_id):
     """
     Increment a recommendation's interesed field
