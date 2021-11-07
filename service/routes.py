@@ -180,8 +180,10 @@ def increment_interested_counter(rec_id):
     if not recommendation:
         raise NotFound(
             "Recommendation with id '{}' was not found.".format(rec_id))
-    count = recommendation.rec_interested
-    if count == None:
-        count = 0
-    recommendation.rec_interested = count + 1
+    recommendation.rec_interested += 1
+    recommendation.update()
+
+    app.logger.info(
+        "Interested count with recommnedation product ID [%s] updated.", recommendation.rec_prod_id)
+
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)

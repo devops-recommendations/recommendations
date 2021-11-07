@@ -67,7 +67,7 @@ class Recommendation(db.Model):
     type = db.Column(
         db.Enum(RecommendationType), nullable=False, server_default=(RecommendationType.Generic.name)
     )
-    rec_interested = db.Column(db.Integer)
+    rec_interested = db.Column(db.Integer, nullable=False, default=0)
 
     ##################################################
     # INSTANCE METHODS
@@ -127,6 +127,11 @@ class Recommendation(db.Model):
             else:
                 raise DataValidationError(
                     "Invalid Query Product ID: " + data['query_prod_id'])
+            if isinstance(data['rec_interested'], int):
+                self.rec_interested = data["rec_interested"]
+            else:
+                raise DataValidationError(
+                    "Invalid Interested Count: " + data['query_prod_id'])
             self.type = getattr(RecommendationType, data["type"])
 
         except AttributeError as error:
