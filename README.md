@@ -2,6 +2,9 @@
 
 [![codecov](https://codecov.io/gh/devops-recommendations/recommendations/branch/main/graph/badge.svg?token=O4GINXC92T)](https://codecov.io/gh/devops-recommendations/recommendations)
 
+![Build](https://github.com/devops-recommendations/recommendations/actions/workflows/workflow.yml/badge.svg)
+
+
 ## Overview
 
 This is the repository that houses the recommendations service that is part of the NYU class **CSCI-GA.2810-001: DevOps
