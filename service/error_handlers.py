@@ -35,7 +35,8 @@ def not_found(error):
     message = str(error)
     app.logger.warning(message)
     return (
-        jsonify(status=status.HTTP_404_NOT_FOUND, error="Not Found", message=message),
+        jsonify(status=status.HTTP_404_NOT_FOUND,
+                error="Not Found", message=message),
         status.HTTP_404_NOT_FOUND,
     )
 

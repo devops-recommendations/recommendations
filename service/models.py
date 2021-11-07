@@ -14,6 +14,7 @@ Attributes:
 query_prod_id (int) - the id of the query product
 rec_prod_id (int) - the id of the recommended product
 type (RecommendationType) - the type of the recommendation
+rec_interested (int) - counter of "interested"  
 
 """
 import logging
@@ -66,6 +67,7 @@ class Recommendation(db.Model):
     type = db.Column(
         db.Enum(RecommendationType), nullable=False, server_default=(RecommendationType.Generic.name)
     )
+    rec_interested = db.Column(db.Integer, nullable=False, default=0)
 
     ##################################################
     # INSTANCE METHODS
@@ -105,6 +107,7 @@ class Recommendation(db.Model):
             "query_prod_id": self.query_prod_id,
             "rec_prod_id": self.rec_prod_id,
             "type": self.type.name,  # convert enum to string
+            "rec_interested": self.rec_interested
         }
 
     def deserialize(self, data: dict):
@@ -124,6 +127,11 @@ class Recommendation(db.Model):
             else:
                 raise DataValidationError(
                     "Invalid Query Product ID: " + data['query_prod_id'])
+            if isinstance(data['rec_interested'], int):
+                self.rec_interested = data["rec_interested"]
+            else:
+                raise DataValidationError(
+                    "Invalid Interested Count: " + data['query_prod_id'])
             self.type = getattr(RecommendationType, data["type"])
 
         except AttributeError as error:
