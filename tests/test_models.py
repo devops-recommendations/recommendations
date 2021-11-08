@@ -151,7 +151,8 @@ class TestRecommendationModel(unittest.TestCase):
             "id": 1,
             "query_prod_id": 50,
             "rec_prod_id": 150,
-            "type": "Generic"
+            "type": "Generic",
+            "rec_interested": 6
         }
         rec = Recommendation()
         rec.deserialize(data)
@@ -160,6 +161,7 @@ class TestRecommendationModel(unittest.TestCase):
 
         self.assertEqual(data["query_prod_id"], 50)
         self.assertEqual(data["rec_prod_id"], 150)
+        self.assertEqual(data["rec_interested"], 6)
 
         self.assertEqual(rec.type, RecommendationType.Generic)
 

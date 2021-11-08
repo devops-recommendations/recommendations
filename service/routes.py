@@ -167,3 +167,29 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         "Content-Type must be {}".format(media_type),
     )
+
+######################################################################
+#  Increment Interested Counter
+######################################################################
+
+
+@app.route('/recommendations/<int:rec_id>/interested', methods=["PUT"])
+def increment_interested_counter(rec_id):
+    """
+    Increment a recommendation's interesed field
+    This endpoint will increment the interested counter by one when interested button is clicked
+    """
+    app.logger.info(
+        'Increment intrested field for recommendation with id: %s', rec_id)
+    check_content_type('application/json')
+    recommendation = Recommendation.find(rec_id)
+    if not recommendation:
+        raise NotFound(
+            "Recommendation with id '{}' was not found.".format(rec_id))
+    recommendation.rec_interested += 1
+    recommendation.update()
+
+    app.logger.info(
+        "Interested count with recommnedation product ID [%s] updated.", recommendation.rec_prod_id)
+
+    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)

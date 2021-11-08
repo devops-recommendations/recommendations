@@ -223,3 +223,27 @@ class TestYourResourceServer(unittest.TestCase):
         resp = self.app.post(BASE_URL)
         self.assertEqual(resp.status_code,
                          status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_increment_interested_counter(self):
+        """Increment of interested counter"""
+        test_recommendation = RecommendationFactory()
+        resp = self.app.post('/recommendations',
+                             json=test_recommendation.serialize(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        new_recommendation = resp.get_json()
+        self.assertEqual(new_recommendation["rec_interested"], 0)
+
+        rec_id = new_recommendation["id"]
+        resp = self.app.put(
+            '/recommendations/{}/interested'.format(rec_id), content_type=CONTENT_TYPE_JSON)
+        updated_recommendation = resp.get_json()
+        self.assertEqual(updated_recommendation["rec_interested"], 1)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_success_not_found(self):
+        """ Increment interested with bad id """
+        resp = self.app.put('/recommendations/0/interested',
+                            content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
