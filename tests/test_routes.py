@@ -137,7 +137,7 @@ class TestYourResourceServer(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-    
+
     def test_query_list_by_product_id(self):
         """Query Recommendations by Query Product ID"""
         recs = self._create_recommendations(10)
@@ -152,7 +152,6 @@ class TestYourResourceServer(unittest.TestCase):
         # check the data just to be sure
         for rec in data:
             self.assertEqual(rec["product_id"], test_product_id)
-        
 
     def test_get_recommendation_not_found(self):
         """Get a Recommendation thats not found"""
@@ -205,7 +204,6 @@ class TestYourResourceServer(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-
     def test_create_recommendation_bad_type(self):
         """ Create a recommendation with bad type data """
         recommendation = RecommendationFactory()
@@ -253,7 +251,10 @@ class TestYourResourceServer(unittest.TestCase):
         recommendations = self._create_recommendations(10)
         test_rec_product_id = recommendations[0].rec_product_id
         rec_product_id_recommendations = [
-            recommendation for recommendation in recommendations if recommendation.rec_product_id == test_rec_product_id]
+            recommendation
+            for recommendation in recommendations
+            if recommendation.rec_product_id == test_rec_product_id
+        ]
         resp = self.app.get(
             BASE_URL, query_string="rec_product_id={}".format(
                 int(test_rec_product_id))
@@ -264,9 +265,11 @@ class TestYourResourceServer(unittest.TestCase):
         # check the data just to be sure
         for recommendation in data:
             self.assertEqual(recommendation["rec_product_id"], test_rec_product_id)
-    
+
     def test_method_405(self):
         """ Method not allowed 405 """
-        resp = self.app.post('/recommendations/0/interested',
-                            content_type=CONTENT_TYPE_JSON)
+        resp = self.app.post(
+                    '/recommendations/0/interested',
+                    content_type=CONTENT_TYPE_JSON
+                )
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -14,7 +14,7 @@ Attributes:
 product_id (int) - the id of the query product
 rec_product_id (int) - the id of the recommended product
 type (RecommendationType) - the type of the recommendation
-interested (int) - counter of "interested"  
+interested (int) - counter of "interested"
 
 """
 import logging
@@ -54,8 +54,7 @@ class Recommendation(db.Model):
 
     This version uses a relational database for persistence which is hidden
     from us by SQLAlchemy's object relational mappings (ORM)
-    """ 
-
+    """
     app: Flask = None
 
     ##################################################
@@ -170,7 +169,6 @@ class Recommendation(db.Model):
         """Returns all of the Recommendation in the database"""
         logger.info("Processing all Recommendations")
         return cls.query.all()
-        
 
     @classmethod
     def find(cls, id: int):
@@ -228,4 +226,3 @@ class Recommendation(db.Model):
             query = query.filter(cls.type == type)
 
         return query
-

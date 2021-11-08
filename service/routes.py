@@ -53,13 +53,13 @@ def list_recommendations():
     recommendations = []
     product_id = request.args.get('product_id')
     rec_product_id = request.args.get("rec_product_id")
-    type = request.args.get("type")
+    rec_type = request.args.get("type")
 
-    if product_id or rec_product_id or type:
+    if product_id or rec_product_id or rec_type:
         recommendations = Recommendation.find_rec_by_filter(
-            product_id = product_id, 
-            rec_product_id=rec_product_id, 
-            type=type
+            product_id=product_id,
+            rec_product_id=rec_product_id,
+            type=rec_type
         )
     else:
         recommendations = Recommendation.all()

@@ -301,7 +301,6 @@ class TestRecommendationModel(unittest.TestCase):
                        type=RecommendationType.Generic).create()
 
         res = Recommendation.find_rec_by_filter(product_id=1, type=RecommendationType.UpSell)
-        
         recs = [rec for rec in res]
         self.assertEqual(recs[0].product_id, 1)
         self.assertEqual(recs[0].rec_product_id, 2)
@@ -318,8 +317,6 @@ class TestRecommendationModel(unittest.TestCase):
                        type=RecommendationType.Generic).create()
 
         res = Recommendation.find_rec_by_filter(rec_product_id=3, type=RecommendationType.UpSell)
-
         recs = [rec for rec in res]
-
         self.assertEqual(recs[0].rec_product_id, 3)
         self.assertEqual(recs[0].type, RecommendationType.UpSell)
