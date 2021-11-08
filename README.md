@@ -43,8 +43,8 @@ This section documents the different data models the service employs.
 ####1. Recommendation
 ```text
 id: Integer, primary key
-query_prod_id: Integer
-rec_prod_id: Integer
+product_id: Integer
+rec_product_id: Integer
 type = <Generic, BoughtTogether, CossSell, UpSell, Complementary>
 ```
 
@@ -103,8 +103,8 @@ curl -X POST \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/json' \
   -d '{
-	"query_prod_id": 1,
-	"rec_prod_id": 2,
+	"product_id": 1,
+	"rec_product_id": 2,
 	"type": "Generic"
 }'                   
 ```
@@ -133,8 +133,8 @@ curl -X PUT \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/json' \
   -d '{
-	"query_prod_id": 1,
-	"rec_prod_id": 3,
+	"product_id": 1,
+	"rec_product_id": 3,
 	"type": "Generic"
 }'                   
 ```
