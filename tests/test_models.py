@@ -57,25 +57,25 @@ class TestRecommendationModel(unittest.TestCase):
 
     def test_create_a_recommendation(self):
         """Create a recommendation and assert that it exists"""
-        rec = Recommendation(query_prod_id=0, rec_prod_id=1,
+        rec = Recommendation(product_id=0, rec_product_id=1,
                              type=RecommendationType.Generic)
         self.assertTrue(rec != None)
         self.assertEqual(rec.id, None)
-        self.assertEqual(rec.query_prod_id, 0)
-        self.assertEqual(rec.rec_prod_id, 1)
+        self.assertEqual(rec.product_id, 0)
+        self.assertEqual(rec.rec_product_id, 1)
         self.assertEqual(rec.type, RecommendationType.Generic)
 
-        rec = Recommendation(query_prod_id=1, rec_prod_id=5,
+        rec = Recommendation(product_id=1, rec_product_id=5,
                              type=RecommendationType.UpSell)
-        self.assertEqual(rec.query_prod_id, 1)
-        self.assertEqual(rec.rec_prod_id, 5)
+        self.assertEqual(rec.product_id, 1)
+        self.assertEqual(rec.rec_product_id, 5)
         self.assertEqual(rec.type, RecommendationType.UpSell)
 
     def test_add_a_recommendation(self):
         """Create a recommendation and add it to the database"""
         recs = Recommendation.all()
         self.assertEqual(recs, [])
-        rec = Recommendation(query_prod_id=1, rec_prod_id=5,
+        rec = Recommendation(product_id=1, rec_product_id=5,
                              type=RecommendationType.UpSell)
         self.assertTrue(rec != None)
         self.assertEqual(rec.id, None)
@@ -93,17 +93,17 @@ class TestRecommendationModel(unittest.TestCase):
         logging.debug(rec)
         self.assertEqual(rec.id, 1)
         # Change it an save it
-        rec.rec_prod_id = 201
+        rec.rec_product_id = 201
         original_id = rec.id
         rec.update()
         self.assertEqual(rec.id, original_id)
-        self.assertEqual(rec.rec_prod_id, 201)
+        self.assertEqual(rec.rec_product_id, 201)
         # Fetch it back and make sure the id hasn't changed
         # but the data did change
         recs = Recommendation.all()
         self.assertEqual(len(recs), 1)
         self.assertEqual(recs[0].id, 1)
-        self.assertEqual(recs[0].rec_prod_id, 201)
+        self.assertEqual(recs[0].rec_product_id, 201)
 
     def test_bad_update(self):
         """Test error on invalid update"""
@@ -116,7 +116,7 @@ class TestRecommendationModel(unittest.TestCase):
 
     def test_result_string_conversion(self):
         """Test printable representation of Recommendation Model"""
-        out = repr(Recommendation(query_prod_id=1, rec_prod_id=2,
+        out = repr(Recommendation(product_id=1, rec_product_id=2,
                    type=RecommendationType.UpSell))
         self.assertEqual(
             out, "<Recommendation of prod=[1] is prod=[2] with id=[None] in table>")
@@ -138,10 +138,10 @@ class TestRecommendationModel(unittest.TestCase):
 
         self.assertIn("id", data)
         self.assertEqual(data["id"], rec.id)
-        self.assertIn("query_prod_id", data)
-        self.assertEqual(data["query_prod_id"], rec.query_prod_id)
-        self.assertIn("rec_prod_id", data)
-        self.assertEqual(data["rec_prod_id"], rec.rec_prod_id)
+        self.assertIn("product_id", data)
+        self.assertEqual(data["product_id"], rec.product_id)
+        self.assertIn("rec_product_id", data)
+        self.assertEqual(data["rec_product_id"], rec.rec_product_id)
         self.assertIn("type", data)
         self.assertEqual(data["type"], rec.type.name)
 
@@ -149,25 +149,25 @@ class TestRecommendationModel(unittest.TestCase):
         """Test deserialization of a Recommendation"""
         data = {
             "id": 1,
-            "query_prod_id": 50,
-            "rec_prod_id": 150,
+            "product_id": 50,
+            "rec_product_id": 150,
             "type": "Generic",
-            "rec_interested": 6
+            "interested": 6
         }
         rec = Recommendation()
         rec.deserialize(data)
         self.assertNotEqual(rec, None)
         self.assertEqual(rec.id, None)
 
-        self.assertEqual(data["query_prod_id"], 50)
-        self.assertEqual(data["rec_prod_id"], 150)
-        self.assertEqual(data["rec_interested"], 6)
+        self.assertEqual(data["product_id"], 50)
+        self.assertEqual(data["rec_product_id"], 150)
+        self.assertEqual(data["interested"], 6)
 
         self.assertEqual(rec.type, RecommendationType.Generic)
 
     def test_deserialize_missing_data(self):
         """Test deserialization of a Recommendation with missing data"""
-        data = {"id": 1, "query_prod_id": 1, "type": "Generic"}
+        data = {"id": 1, "product_id": 1, "type": "Generic"}
         rec = Recommendation()
         self.assertRaises(DataValidationError, rec.deserialize, data)
 
@@ -185,19 +185,19 @@ class TestRecommendationModel(unittest.TestCase):
         rec = Recommendation()
         self.assertRaises(DataValidationError, rec.deserialize, data)
 
-    def test_deserialize_bad_query_prod_id(self):
+    def test_deserialize_bad_product_id(self):
         """ Test deserialization of bad Query Product ID attribute """
         test_rec = RecommendationFactory()
         data = test_rec.serialize()
-        data["query_prod_id"] = "1234"  # wrong datatype
+        data["product_id"] = "1234"  # wrong datatype
         rec = Recommendation()
         self.assertRaises(DataValidationError, rec.deserialize, data)
 
-    def test_deserialize_bad_rec_prod_id(self):
+    def test_deserialize_bad_rec_product_id(self):
         """ Test deserialization of bad Recommended Product ID attribute """
         test_rec = RecommendationFactory()
         data = test_rec.serialize()
-        data["rec_prod_id"] = "1234"  # wrong datatype
+        data["rec_product_id"] = "1234"  # wrong datatype
         rec = Recommendation()
         self.assertRaises(DataValidationError, rec.deserialize, data)
 
@@ -205,7 +205,7 @@ class TestRecommendationModel(unittest.TestCase):
         """ Test deserialization of bad interested attribute """
         test_rec = RecommendationFactory()
         data = test_rec.serialize()
-        data["rec_interested"] = "1234"  # wrong datatype
+        data["interested"] = "1234"  # wrong datatype
         rec = Recommendation()
         self.assertRaises(DataValidationError, rec.deserialize, data)
 
@@ -221,8 +221,8 @@ class TestRecommendationModel(unittest.TestCase):
         self.assertIsNot(rec, None)
         self.assertEqual(rec.id, recs[1].id)
 
-        self.assertEqual(rec.query_prod_id, recs[1].query_prod_id)
-        self.assertEqual(rec.rec_prod_id, recs[1].rec_prod_id)
+        self.assertEqual(rec.product_id, recs[1].product_id)
+        self.assertEqual(rec.rec_product_id, recs[1].rec_product_id)
         self.assertEqual(rec.type, recs[1].type)
 
     def test_find_or_404_found(self):
@@ -234,8 +234,8 @@ class TestRecommendationModel(unittest.TestCase):
         rec = Recommendation.find_or_404(recs[1].id)
         self.assertIsNot(rec, None)
         self.assertEqual(rec.id, recs[1].id)
-        self.assertEqual(rec.query_prod_id, recs[1].query_prod_id)
-        self.assertEqual(rec.rec_prod_id, recs[1].rec_prod_id)
+        self.assertEqual(rec.product_id, recs[1].product_id)
+        self.assertEqual(rec.rec_product_id, recs[1].rec_product_id)
         self.assertEqual(rec.type, recs[1].type)
 
     def test_find_or_404_not_found(self):
@@ -244,82 +244,82 @@ class TestRecommendationModel(unittest.TestCase):
 
     def test_find_by_type(self):
         """Find Recommedations by Recommendation Type"""
-        Recommendation(query_prod_id=1, rec_prod_id=5,
+        Recommendation(product_id=1, rec_product_id=5,
                        type=RecommendationType.Generic).create()
-        Recommendation(query_prod_id=1, rec_prod_id=10,
+        Recommendation(product_id=1, rec_product_id=10,
                        type=RecommendationType.Generic).create()
-        Recommendation(query_prod_id=2, rec_prod_id=5,
+        Recommendation(product_id=2, rec_product_id=5,
                        type=RecommendationType.Generic).create()
 
-        res = Recommendation.find_by_type(RecommendationType.Generic)
+        res = Recommendation.find_rec_by_filter(type=RecommendationType.Generic)
         recs = [rec for rec in res]
 
         self.assertEqual(len(recs), 3)
-        self.assertEqual(recs[0].query_prod_id, 1)
-        self.assertEqual(recs[0].rec_prod_id, 5)
+        self.assertEqual(recs[0].product_id, 1)
+        self.assertEqual(recs[0].rec_product_id, 5)
         self.assertEqual(recs[0].type, RecommendationType.Generic)
 
-    def test_find_by_query_prod_id(self):
+    def test_find_by_product_id(self):
         """Find Recommedations by Query Product ID"""
-        Recommendation(query_prod_id=1, rec_prod_id=5,
+        Recommendation(product_id=1, rec_product_id=5,
                        type=RecommendationType.Generic).create()
-        Recommendation(query_prod_id=1, rec_prod_id=10,
+        Recommendation(product_id=1, rec_product_id=10,
                        type=RecommendationType.UpSell).create()
-        Recommendation(query_prod_id=2, rec_prod_id=5,
+        Recommendation(product_id=2, rec_product_id=5,
                        type=RecommendationType.CrossSell).create()
 
-        res = Recommendation.find_by_query_prod_id(2)
+        res = Recommendation.find_rec_by_filter(product_id=2)
         recs = [rec for rec in res]
 
-        self.assertEqual(recs[0].query_prod_id, 2)
-        self.assertEqual(recs[0].rec_prod_id, 5)
+        self.assertEqual(recs[0].product_id, 2)
+        self.assertEqual(recs[0].rec_product_id, 5)
         self.assertEqual(recs[0].type, RecommendationType.CrossSell)
 
-    def test_find_by_rec_prod_id(self):
+    def test_find_by_rec_product_id(self):
         """Find Recommedations by Recommended Product ID"""
-        Recommendation(query_prod_id=1, rec_prod_id=5,
+        Recommendation(product_id=1, rec_product_id=5,
                        type=RecommendationType.Generic).create()
-        Recommendation(query_prod_id=1, rec_prod_id=10,
+        Recommendation(product_id=1, rec_product_id=10,
                        type=RecommendationType.UpSell).create()
-        Recommendation(query_prod_id=2, rec_prod_id=5,
+        Recommendation(product_id=2, rec_product_id=5,
                        type=RecommendationType.CrossSell).create()
 
-        res = Recommendation.find_by_rec_prod_id(10)
+        res = Recommendation.find_rec_by_filter(rec_product_id=10)
         recs = [rec for rec in res]
 
-        self.assertEqual(recs[0].rec_prod_id, 10)
+        self.assertEqual(recs[0].rec_product_id, 10)
         self.assertEqual(recs[0].type, RecommendationType.UpSell)
 
-    def test_find_by_query_prod_id_and_type(self):
+    def test_find_by_product_id_and_type(self):
         """Find Recommedations by Query Product ID and Type"""
 
-        Recommendation(query_prod_id=1, rec_prod_id=2,
+        Recommendation(product_id=1, rec_product_id=2,
                        type=RecommendationType.UpSell).create()
-        Recommendation(query_prod_id=1, rec_prod_id=3,
+        Recommendation(product_id=1, rec_product_id=3,
                        type=RecommendationType.UpSell).create()
-        Recommendation(query_prod_id=1, rec_prod_id=4,
+        Recommendation(product_id=1, rec_product_id=4,
                        type=RecommendationType.Generic).create()
 
-        res = Recommendation.find_by_query_prod_id_and_type(
-            1, RecommendationType.UpSell)
+        res = Recommendation.find_rec_by_filter(product_id=1, type=RecommendationType.UpSell)
+        
         recs = [rec for rec in res]
-        self.assertEqual(recs[0].query_prod_id, 1)
-        self.assertEqual(recs[0].rec_prod_id, 2)
+        self.assertEqual(recs[0].product_id, 1)
+        self.assertEqual(recs[0].rec_product_id, 2)
         self.assertEqual(recs[0].type, RecommendationType.UpSell)
 
-    def test_find_by_rec_prod_id_and_type(self):
+    def test_find_by_rec_product_id_and_type(self):
         """Find Recommedations by Recommended Product ID and Type"""
 
-        Recommendation(query_prod_id=1, rec_prod_id=3,
+        Recommendation(product_id=1, rec_product_id=3,
                        type=RecommendationType.UpSell).create()
-        Recommendation(query_prod_id=2, rec_prod_id=3,
+        Recommendation(product_id=2, rec_product_id=3,
                        type=RecommendationType.UpSell).create()
-        Recommendation(query_prod_id=1, rec_prod_id=4,
+        Recommendation(product_id=1, rec_product_id=4,
                        type=RecommendationType.Generic).create()
 
-        res = Recommendation.find_by_rec_prod_id_and_type(
-            3, RecommendationType.UpSell)
+        res = Recommendation.find_rec_by_filter(rec_product_id=3, type=RecommendationType.UpSell)
+
         recs = [rec for rec in res]
 
-        self.assertEqual(recs[0].rec_prod_id, 3)
+        self.assertEqual(recs[0].rec_product_id, 3)
         self.assertEqual(recs[0].type, RecommendationType.UpSell)

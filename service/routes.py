@@ -41,7 +41,7 @@ def index():
     )
 
 ######################################################################
-# LIST ALL RECOMMENDATIONS
+# LIST ALL RECOMMENDATIONS & QUERY RECOMMENDATIONS
 ######################################################################
 
 
@@ -51,10 +51,16 @@ def list_recommendations():
 
     app.logger.info("Request for recommendations list")
     recommendations = []
-    query_prod_id = request.args.get('query_prod_id')
+    product_id = request.args.get('product_id')
+    rec_product_id = request.args.get("rec_product_id")
+    type = request.args.get("type")
 
-    if query_prod_id:
-        recommendations = Recommendation.find_by_query_prod_id(query_prod_id)
+    if product_id or rec_product_id or type:
+        recommendations = Recommendation.find_rec_by_filter(
+            product_id = product_id, 
+            rec_product_id=rec_product_id, 
+            type=type
+        )
     else:
         recommendations = Recommendation.all()
 
@@ -81,7 +87,7 @@ def create_recommendation():
     recommendation.create()
     message = recommendation.serialize()
     location_url = url_for("list_recommendations",
-                           rec_id=recommendation.id, _external=True)
+                           id=recommendation.id, _external=True)
 
     app.logger.info("Recommendation with ID [%s] created.", recommendation.id)
     return make_response(
@@ -93,17 +99,17 @@ def create_recommendation():
 ######################################################################
 
 
-@app.route("/recommendations/<int:rec_id>", methods=["GET"])
-def get_recommendations(rec_id):
+@app.route("/recommendations/<int:id>", methods=["GET"])
+def get_recommendations(id):
     """
     Retrieve a single Recommendation
     This endpoint will return a Recommendation based on it's id
     """
-    app.logger.info("Request for recommendation with id: %s", rec_id)
-    recommendation = Recommendation.find(rec_id)
+    app.logger.info("Request for recommendation with id: %s", id)
+    recommendation = Recommendation.find(id)
     if not recommendation:
         raise NotFound(
-            "Recommendation with id '{}' was not found.".format(rec_id))
+            "Recommendation with id '{}' was not found.".format(id))
 
     app.logger.info("Returning recommendation: %s", recommendation.id)
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
@@ -113,18 +119,18 @@ def get_recommendations(rec_id):
 ######################################################################
 
 
-@app.route("/recommendations/<int:rec_id>", methods=["DELETE"])
-def delete_recommendations(rec_id):
+@app.route("/recommendations/<int:id>", methods=["DELETE"])
+def delete_recommendations(id):
     """
     Delete a single Recommendation
     This endpoint will delete a Recommendation based the id specified in the path
     """
-    app.logger.info("Request to delete recommendation with id: %s", rec_id)
-    recommendation = Recommendation.find(rec_id)
+    app.logger.info("Request to delete recommendation with id: %s", id)
+    recommendation = Recommendation.find(id)
     if recommendation:
         recommendation.delete()
 
-    app.logger.info("Recommendation with ID [%s] delete complete.", rec_id)
+    app.logger.info("Recommendation with ID [%s] delete complete.", id)
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 ######################################################################
@@ -132,20 +138,20 @@ def delete_recommendations(rec_id):
 ######################################################################
 
 
-@app.route("/recommendations/<int:rec_id>", methods=["PUT"])
-def update_recommendations(rec_id):
+@app.route("/recommendations/<int:id>", methods=["PUT"])
+def update_recommendations(id):
     """
     Update a Recommendation
     This endpoint will update a Recommendation based the body that is posted
     """
-    app.logger.info("Request to update recommendations with id: %s", rec_id)
+    app.logger.info("Request to update recommendations with id: %s", id)
     check_content_type("application/json")
-    recommendation = Recommendation.find(rec_id)
+    recommendation = Recommendation.find(id)
     if not recommendation:
         raise NotFound(
-            "Recommendation with id '{}' was not found.".format(rec_id))
+            "Recommendation with id '{}' was not found.".format(id))
     recommendation.deserialize(request.get_json())
-    recommendation.id = rec_id
+    recommendation.id = id
     recommendation.update()
 
     app.logger.info("Recommendation with ID [%s] updated.", recommendation.id)
@@ -173,23 +179,23 @@ def check_content_type(media_type):
 ######################################################################
 
 
-@app.route('/recommendations/<int:rec_id>/interested', methods=["PUT"])
-def increment_interested_counter(rec_id):
+@app.route('/recommendations/<int:id>/interested', methods=["PUT"])
+def increment_interested_counter(id):
     """
     Increment a recommendation's interesed field
     This endpoint will increment the interested counter by one when interested button is clicked
     """
     app.logger.info(
-        'Increment intrested field for recommendation with id: %s', rec_id)
+        'Increment intrested field for recommendation with id: %s', id)
     check_content_type('application/json')
-    recommendation = Recommendation.find(rec_id)
+    recommendation = Recommendation.find(id)
     if not recommendation:
         raise NotFound(
-            "Recommendation with id '{}' was not found.".format(rec_id))
-    recommendation.rec_interested += 1
+            "Recommendation with id '{}' was not found.".format(id))
+    recommendation.interested += 1
     recommendation.update()
 
     app.logger.info(
-        "Interested count with recommnedation product ID [%s] updated.", recommendation.rec_prod_id)
+        "Interested count with recommendation ID [%s] updated.", recommendation.id)
 
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
