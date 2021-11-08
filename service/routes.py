@@ -50,7 +50,13 @@ def list_recommendations():
     """Returns all of the Recommendations for all products"""
 
     app.logger.info("Request for recommendations list")
-    recommendations = Recommendation.all()
+    recommendations = []
+    query_prod_id = request.args.get('query_prod_id')
+
+    if query_prod_id:
+        recommendations = Recommendation.find_by_query_prod_id(query_prod_id)
+    else:
+        recommendations = Recommendation.all()
 
     results = [recommendation.serialize()
                for recommendation in recommendations]
@@ -98,7 +104,6 @@ def get_recommendations(rec_id):
     if not recommendation:
         raise NotFound(
             "Recommendation with id '{}' was not found.".format(rec_id))
-        return make_response(jsonify(recommendation.serialize()), status.HTTP_400_BAD_REQUEST)
 
     app.logger.info("Returning recommendation: %s", recommendation.id)
     return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)

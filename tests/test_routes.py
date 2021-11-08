@@ -11,7 +11,7 @@ from unittest import mock
 
 from urllib.parse import quote_plus
 from service import status  # HTTP Status Codes
-from service.models import db, init_db, DataValidationError
+from service.models import Recommendation, db, init_db, DataValidationError
 from service.routes import app
 from .factories import RecommendationFactory
 
@@ -138,7 +138,22 @@ class TestYourResourceServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["query_prod_id"], test_rec.query_prod_id)
-
+    
+    def test_query_list_by_query_prod_id(self):
+        """Query Recommendations by Query Product ID"""
+        recs = self._create_recommendations(10)
+        test_query_prod_id = recs[0].query_prod_id
+        query_recs = [rec for rec in recs if rec.query_prod_id == test_query_prod_id]
+        resp = self.app.get(
+            BASE_URL, query_string="query_prod_id={}".format(test_query_prod_id)
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), len(query_recs))
+        # check the data just to be sure
+        for rec in data:
+            self.assertEqual(rec["query_prod_id"], test_query_prod_id)
+        
     def test_get_recommendation_not_found(self):
         """Get a Recommendation thats not found"""
         resp = self.app.get("/recommendations/0")
@@ -179,6 +194,17 @@ class TestYourResourceServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_recommendation = resp.get_json()
         self.assertEqual(updated_recommendation["query_prod_id"], 5)
+
+    def test_bad_update_recommendation(self):
+        """Update an Recommendation that does not exist"""
+        new_recommendation = RecommendationFactory()
+        resp = self.app.put(
+            "/recommendations/{}".format(new_recommendation.id),
+            json=new_recommendation.serialize(),
+            content_type=CONTENT_TYPE_JSON,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
 
     def test_create_recommendation_bad_type(self):
         """ Create a recommendation with bad type data """

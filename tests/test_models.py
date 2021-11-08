@@ -250,7 +250,7 @@ class TestRecommendationModel(unittest.TestCase):
         self.assertEqual(recs[0].type, RecommendationType.Generic)
 
     def test_find_by_query_prod_id(self):
-        """Find Recommedations by Product ID"""
+        """Find Recommedations by Query Product ID"""
         Recommendation(query_prod_id=1, rec_prod_id=5,
                        type=RecommendationType.Generic).create()
         Recommendation(query_prod_id=1, rec_prod_id=10,
@@ -281,7 +281,7 @@ class TestRecommendationModel(unittest.TestCase):
         self.assertEqual(recs[0].type, RecommendationType.UpSell)
 
     def test_find_by_query_prod_id_and_type(self):
-        """Find Recommedations by Product ID and Type"""
+        """Find Recommedations by Query Product ID and Type"""
 
         Recommendation(query_prod_id=1, rec_prod_id=2,
                        type=RecommendationType.UpSell).create()
