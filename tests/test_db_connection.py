@@ -50,7 +50,7 @@ class TestDBConnection(unittest.TestCase):
         db.session.remove()
 
     def test_connection(self):
-        """Test to check if DB is alive"""
+        """DB is alive"""
         db.init_app(app)
         app.app_context().push()
 

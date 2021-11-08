@@ -201,6 +201,14 @@ class TestRecommendationModel(unittest.TestCase):
         rec = Recommendation()
         self.assertRaises(DataValidationError, rec.deserialize, data)
 
+    def test_deserialize_bad_interested(self):
+        """ Test deserialization of bad interested attribute """
+        test_rec = RecommendationFactory()
+        data = test_rec.serialize()
+        data["interested"] = "1234"  # wrong datatype
+        rec = Recommendation()
+        self.assertRaises(DataValidationError, rec.deserialize, data)
+
     def test_find_rec(self):
         """Find a Recommendation by ID"""
         recs = RecommendationFactory.create_batch(3)
@@ -243,7 +251,7 @@ class TestRecommendationModel(unittest.TestCase):
         Recommendation(product_id=2, rec_product_id=5,
                        type=RecommendationType.Generic).create()
 
-        res = Recommendation.find_by_type(RecommendationType.Generic)
+        res = Recommendation.find_rec_by_filter(type=RecommendationType.Generic)
         recs = [rec for rec in res]
 
         self.assertEqual(len(recs), 3)
@@ -252,7 +260,7 @@ class TestRecommendationModel(unittest.TestCase):
         self.assertEqual(recs[0].type, RecommendationType.Generic)
 
     def test_find_by_product_id(self):
-        """Find Recommedations by Product ID"""
+        """Find Recommedations by Query Product ID"""
         Recommendation(product_id=1, rec_product_id=5,
                        type=RecommendationType.Generic).create()
         Recommendation(product_id=1, rec_product_id=10,
@@ -260,7 +268,7 @@ class TestRecommendationModel(unittest.TestCase):
         Recommendation(product_id=2, rec_product_id=5,
                        type=RecommendationType.CrossSell).create()
 
-        res = Recommendation.find_by_product_id(2)
+        res = Recommendation.find_rec_by_filter(product_id=2)
         recs = [rec for rec in res]
 
         self.assertEqual(recs[0].product_id, 2)
@@ -276,14 +284,14 @@ class TestRecommendationModel(unittest.TestCase):
         Recommendation(product_id=2, rec_product_id=5,
                        type=RecommendationType.CrossSell).create()
 
-        res = Recommendation.find_by_rec_product_id(10)
+        res = Recommendation.find_rec_by_filter(rec_product_id=10)
         recs = [rec for rec in res]
 
         self.assertEqual(recs[0].rec_product_id, 10)
         self.assertEqual(recs[0].type, RecommendationType.UpSell)
 
     def test_find_by_product_id_and_type(self):
-        """Find Recommedations by Product ID and Type"""
+        """Find Recommedations by Query Product ID and Type"""
 
         Recommendation(product_id=1, rec_product_id=2,
                        type=RecommendationType.UpSell).create()
@@ -292,8 +300,7 @@ class TestRecommendationModel(unittest.TestCase):
         Recommendation(product_id=1, rec_product_id=4,
                        type=RecommendationType.Generic).create()
 
-        res = Recommendation.find_by_product_id_and_type(
-            1, RecommendationType.UpSell)
+        res = Recommendation.find_rec_by_filter(product_id=1, type=RecommendationType.UpSell)
         recs = [rec for rec in res]
         self.assertEqual(recs[0].product_id, 1)
         self.assertEqual(recs[0].rec_product_id, 2)
@@ -309,9 +316,7 @@ class TestRecommendationModel(unittest.TestCase):
         Recommendation(product_id=1, rec_product_id=4,
                        type=RecommendationType.Generic).create()
 
-        res = Recommendation.find_by_rec_product_id_and_type(
-            3, RecommendationType.UpSell)
+        res = Recommendation.find_rec_by_filter(rec_product_id=3, type=RecommendationType.UpSell)
         recs = [rec for rec in res]
-
         self.assertEqual(recs[0].rec_product_id, 3)
         self.assertEqual(recs[0].type, RecommendationType.UpSell)
