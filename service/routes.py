@@ -41,7 +41,7 @@ def index():
     )
 
 ######################################################################
-# LIST ALL RECOMMENDATIONS
+# LIST ALL RECOMMENDATIONS & QUERY RECOMMENDATIONS
 ######################################################################
 
 
@@ -50,8 +50,12 @@ def list_recommendations():
     """Returns all of the Recommendations for all products"""
 
     app.logger.info("Request for recommendations list")
-    recommendations = Recommendation.all()
-
+    recommendations = []
+    rec_prod_id = request.args.get("rec_prod_id")
+    if rec_prod_id != None:
+        recommendations = Recommendation.find_by_rec_prod_id(rec_prod_id)
+    else:
+        recommendations = Recommendation.all()
     results = [recommendation.serialize()
                for recommendation in recommendations]
     app.logger.info("Returning %d recommendations", len(results))
