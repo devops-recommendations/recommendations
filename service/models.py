@@ -11,10 +11,10 @@ Recommendation - A table that contains product recommendations for given product
 
 Attributes:
 -----------
-query_prod_id (int) - the id of the query product
-rec_prod_id (int) - the id of the recommended product
+product_id (int) - the id of the query product
+rec_product_id (int) - the id of the recommended product
 type (RecommendationType) - the type of the recommendation
-rec_interested (int) - counter of "interested"  
+interested (int) - counter of "interested"  
 
 """
 import logging
@@ -62,19 +62,19 @@ class Recommendation(db.Model):
     # Table Schema
     ##################################################
     id = db.Column(db.Integer, primary_key=True)
-    query_prod_id = db.Column(db.Integer, nullable=False)
-    rec_prod_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
+    rec_product_id = db.Column(db.Integer, nullable=False)
     type = db.Column(
         db.Enum(RecommendationType), nullable=False, server_default=(RecommendationType.Generic.name)
     )
-    rec_interested = db.Column(db.Integer, nullable=False, default=0)
+    interested = db.Column(db.Integer, nullable=False, default=0)
 
     ##################################################
     # INSTANCE METHODS
     ##################################################
 
     def __repr__(self):
-        return "<Recommendation of prod=[%d] is prod=[%d] with id=[%s] in table>" % (self.query_prod_id, self.rec_prod_id, self.id)
+        return "<Recommendation of prod=[%d] is prod=[%d] with id=[%s] in table>" % (self.product_id, self.rec_product_id, self.id)
 
     def create(self):
         """
@@ -104,10 +104,10 @@ class Recommendation(db.Model):
         """Serializes a Recommendation into a dictionary"""
         return {
             "id": self.id,
-            "query_prod_id": self.query_prod_id,
-            "rec_prod_id": self.rec_prod_id,
+            "product_id": self.product_id,
+            "rec_product_id": self.rec_product_id,
             "type": self.type.name,  # convert enum to string
-            "rec_interested": self.rec_interested
+            "interested": self.interested
         }
 
     def deserialize(self, data: dict):
@@ -117,21 +117,21 @@ class Recommendation(db.Model):
             data (dict): A dictionary containing the Recommendation data
         """
         try:
-            if isinstance(data['query_prod_id'], int):
-                self.query_prod_id = data["query_prod_id"]
+            if isinstance(data['product_id'], int):
+                self.product_id = data["product_id"]
             else:
                 raise DataValidationError(
-                    "Invalid Query Product ID: " + data['query_prod_id'])
-            if isinstance(data['rec_prod_id'], int):
-                self.rec_prod_id = data["rec_prod_id"]
+                    "Invalid Query Product ID: " + data['product_id'])
+            if isinstance(data['rec_product_id'], int):
+                self.rec_product_id = data["rec_product_id"]
             else:
                 raise DataValidationError(
-                    "Invalid Query Product ID: " + data['query_prod_id'])
-            if isinstance(data['rec_interested'], int):
-                self.rec_interested = data["rec_interested"]
+                    "Invalid Query Product ID: " + data['product_id'])
+            if isinstance(data['interested'], int):
+                self.interested = data["interested"]
             else:
                 raise DataValidationError(
-                    "Invalid Interested Count: " + data['query_prod_id'])
+                    "Invalid Interested Count: " + data['product_id'])
             self.type = getattr(RecommendationType, data["type"])
 
         except AttributeError as error:
@@ -172,32 +172,32 @@ class Recommendation(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, rec_id: int):
+    def find(cls, id: int):
         """Finds a Recommendation by it's ID
 
-        :param rec_id: the id of the Recommendation to find
-        :type rec_id: int
+        :param id: the id of the Recommendation to find
+        :type id: int
 
-        :return: an instance with the rec_id, or None if not found
+        :return: an instance with the id, or None if not found
         :rtype: Recommendation
 
         """
-        logger.info("Processing lookup for id %s ...", rec_id)
-        return cls.query.get(rec_id)
+        logger.info("Processing lookup for id %s ...", id)
+        return cls.query.get(id)
 
     @classmethod
-    def find_or_404(cls, rec_id: int):
+    def find_or_404(cls, id: int):
         """Find a Recommendation by it's id
 
-        :param rec_id: the id of the rec to find
-        :type rec_id: int
+        :param id: the id of the rec to find
+        :type id: int
 
-        :return: an instance with the rec_id, or 404_NOT_FOUND if not found
+        :return: an instance with the id, or 404_NOT_FOUND if not found
         :rtype: Recommendation
 
         """
-        logger.info("Processing lookup or 404 for id %s ...", rec_id)
-        return cls.query.get_or_404(rec_id)
+        logger.info("Processing lookup or 404 for id %s ...", id)
+        return cls.query.get_or_404(id)
 
     @classmethod
     def find_by_type(cls, type: str) -> list:
@@ -211,7 +211,7 @@ class Recommendation(db.Model):
         return cls.query.filter(cls.type == type)
 
     @classmethod
-    def find_by_query_prod_id(cls, query_prod_id: int) -> list:
+    def find_by_product_id(cls, product_id: int) -> list:
         """Returns all Recommendations for a given product
 
         :param prod_id: the prod_id of Query Product whose Recommendations you want
@@ -222,58 +222,58 @@ class Recommendation(db.Model):
 
         """
         logger.info(
-            "Processing find product recommendation query for %s ...", query_prod_id)
-        return cls.query.filter(cls.query_prod_id == query_prod_id)
+            "Processing find product recommendation query for %s ...", product_id)
+        return cls.query.filter(cls.product_id == product_id)
 
     @classmethod
-    def find_by_query_prod_id_and_type(cls, query_prod_id: int, type: RecommendationType = RecommendationType.Generic) -> list:
+    def find_by_product_id_and_type(cls, product_id: int, type: RecommendationType = RecommendationType.Generic) -> list:
         """Returns all of the Recommendations for query product of a given type
 
         :param
-            query_prod_id: the product_id of the product for which you want recommendations
+            product_id: the product_id of the product for which you want recommendations
             type: the type of the recommendation you want to retrieve
         :type
-            query_prod_id: int
+            product_id: int
             type: RecommendationType
 
-        :return: a collection of Recommendations for query_prod_id and type
+        :return: a collection of Recommendations for product_id and type
         :rtype: list
 
         """
         logger.info("Processing prod_id and type query for %s %s...",
-                    query_prod_id, type.name)
-        return cls.query.filter(cls.query_prod_id == query_prod_id, cls.type == type)
+                    product_id, type.name)
+        return cls.query.filter(cls.product_id == product_id, cls.type == type)
 
     @classmethod
-    def find_by_rec_prod_id(cls, rec_prod_id: int) -> list:
+    def find_by_rec_product_id(cls, rec_product_id: int) -> list:
         """Returns all Recommendations for a given product
 
         :param prod_id: the prod_id of a Recommendation Product which are recommended to other products
         :type prod_id: int
 
-        :return: a collection of Recommendations for a given rec_prod_id
+        :return: a collection of Recommendations for a given rec_product_id
         :rtype: list
 
         """
         logger.info(
-            "Processing find recommendation product query for %s ...", rec_prod_id)
-        return cls.query.filter(cls.rec_prod_id == rec_prod_id)
+            "Processing find recommendation product query for %s ...", rec_product_id)
+        return cls.query.filter(cls.rec_product_id == rec_product_id)
 
     @classmethod
-    def find_by_rec_prod_id_and_type(cls, rec_prod_id: int, type: RecommendationType = RecommendationType.Generic) -> list:
+    def find_by_rec_product_id_and_type(cls, rec_product_id: int, type: RecommendationType = RecommendationType.Generic) -> list:
         """Returns all of the Recommendations for recommended product of a given type
 
         :param
-            rec_prod_id: the product_id of a recommended product (cls.rec_prod_id)
+            rec_product_id: the product_id of a recommended product (cls.rec_product_id)
             type: the type of the recommendation entries you want to retrieve
         :type
-            rec_prod_id: int
+            rec_product_id: int
             type: RecommendationType
 
-        :return: a collection of Recommendations for rec_prod_id and type
+        :return: a collection of Recommendations for rec_product_id and type
         :rtype: list
 
         """
         logger.info(
-            "Processing find recommendation products of a type query for %s %s...", rec_prod_id, type.name)
-        return cls.query.filter(cls.rec_prod_id == rec_prod_id, cls.type == type)
+            "Processing find recommendation products of a type query for %s %s...", rec_product_id, type.name)
+        return cls.query.filter(cls.rec_product_id == rec_product_id, cls.type == type)

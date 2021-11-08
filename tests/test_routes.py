@@ -108,9 +108,9 @@ class TestYourResourceServer(unittest.TestCase):
         # Check the data is correct
         new_rec = resp.get_json()
         self.assertEqual(
-            new_rec["query_prod_id"], test_rec.query_prod_id, "Query_prod_id do not match")
+            new_rec["product_id"], test_rec.product_id, "product_id do not match")
         self.assertEqual(
-            new_rec["rec_prod_id"], test_rec.rec_prod_id, "Rec_prod do not match"
+            new_rec["rec_product_id"], test_rec.rec_product_id, "Rec_prod do not match"
         )
         self.assertEqual(
             new_rec["type"], test_rec.type.name, "Type does not match"
@@ -119,10 +119,10 @@ class TestYourResourceServer(unittest.TestCase):
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_rec = resp.get_json()
-        self.assertEqual(new_rec[0]['query_prod_id'],
-                         test_rec.query_prod_id, "Query_prod_id do not match")
+        self.assertEqual(new_rec[0]['product_id'],
+                         test_rec.product_id, "product_id do not match")
         self.assertEqual(
-            new_rec[0]["rec_prod_id"], test_rec.rec_prod_id, "Rec_prod do not match"
+            new_rec[0]["rec_product_id"], test_rec.rec_product_id, "Rec_prod do not match"
         )
         self.assertEqual(
             new_rec[0]["type"], test_rec.type.name, "Type does not match"
@@ -137,7 +137,7 @@ class TestYourResourceServer(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-        self.assertEqual(data["query_prod_id"], test_rec.query_prod_id)
+        self.assertEqual(data["product_id"], test_rec.product_id)
 
     def test_get_recommendation_not_found(self):
         """Get a Recommendation thats not found"""
@@ -170,7 +170,7 @@ class TestYourResourceServer(unittest.TestCase):
         # update the recommendation
         new_recommendation = resp.get_json()
         logging.debug(new_recommendation)
-        new_recommendation["query_prod_id"] = 5
+        new_recommendation["product_id"] = 5
         resp = self.app.put(
             "/recommendations/{}".format(new_recommendation["id"]),
             json=new_recommendation,
@@ -178,7 +178,7 @@ class TestYourResourceServer(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_recommendation = resp.get_json()
-        self.assertEqual(updated_recommendation["query_prod_id"], 5)
+        self.assertEqual(updated_recommendation["product_id"], 5)
 
     def test_create_recommendation_bad_type(self):
         """ Create a recommendation with bad type data """
@@ -207,13 +207,13 @@ class TestYourResourceServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         new_recommendation = resp.get_json()
-        self.assertEqual(new_recommendation["rec_interested"], 0)
+        self.assertEqual(new_recommendation["interested"], 0)
 
-        rec_id = new_recommendation["id"]
+        id = new_recommendation["id"]
         resp = self.app.put(
-            '/recommendations/{}/interested'.format(rec_id), content_type=CONTENT_TYPE_JSON)
+            '/recommendations/{}/interested'.format(id), content_type=CONTENT_TYPE_JSON)
         updated_recommendation = resp.get_json()
-        self.assertEqual(updated_recommendation["rec_interested"], 1)
+        self.assertEqual(updated_recommendation["interested"], 1)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_success_not_found(self):
