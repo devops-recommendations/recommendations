@@ -201,6 +201,14 @@ class TestRecommendationModel(unittest.TestCase):
         rec = Recommendation()
         self.assertRaises(DataValidationError, rec.deserialize, data)
 
+    def test_deserialize_bad_interested(self):
+        """ Test deserialization of bad interested attribute """
+        test_rec = RecommendationFactory()
+        data = test_rec.serialize()
+        data["rec_interested"] = "1234"  # wrong datatype
+        rec = Recommendation()
+        self.assertRaises(DataValidationError, rec.deserialize, data)
+
     def test_find_rec(self):
         """Find a Recommendation by ID"""
         recs = RecommendationFactory.create_batch(3)
