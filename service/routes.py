@@ -51,9 +51,9 @@ def list_recommendations():
 
     app.logger.info("Request for recommendations list")
     recommendations = []
-    rec_prod_id = request.args.get("rec_prod_id")
-    if rec_prod_id != None:
-        recommendations = Recommendation.find_by_rec_prod_id(rec_prod_id)
+    rec_product_id = request.args.get("rec_product_id")
+    if rec_product_id != None:
+        recommendations = Recommendation.find_by_rec_product_id(rec_product_id)
     else:
         recommendations = Recommendation.all()
     results = [recommendation.serialize()

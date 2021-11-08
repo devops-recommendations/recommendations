@@ -222,19 +222,19 @@ class TestYourResourceServer(unittest.TestCase):
                             content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_query_recommendation_by_rec_prod_id(self):
-        """Query Recomendations by the rec_prod_id"""
+    def test_query_recommendation_by_rec_product_id(self):
+        """Query Recomendations by the rec_product_id"""
         recommendations = self._create_recommendations(10)
-        test_rec_prod_id = recommendations[0].rec_prod_id
-        rec_prod_id_recommendations = [
-            recommendation for recommendation in recommendations if recommendation.rec_prod_id == test_rec_prod_id]
+        test_rec_product_id = recommendations[0].rec_product_id
+        rec_product_id_recommendations = [
+            recommendation for recommendation in recommendations if recommendation.rec_product_id == test_rec_product_id]
         resp = self.app.get(
-            BASE_URL, query_string="rec_prod_id={}".format(
-                int(test_rec_prod_id))
+            BASE_URL, query_string="rec_product_id={}".format(
+                int(test_rec_product_id))
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-        self.assertEqual(len(data), len(rec_prod_id_recommendations))
+        self.assertEqual(len(data), len(rec_product_id_recommendations))
         # check the data just to be sure
         for recommendation in data:
-            self.assertEqual(recommendation["rec_prod_id"], test_rec_prod_id)
+            self.assertEqual(recommendation["rec_product_id"], test_rec_product_id)
