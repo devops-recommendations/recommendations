@@ -3,8 +3,8 @@
 applications:
 - name: nyu-recommendations-service-fall2021
   path: .
-  instances: 2
-  memory: 64M
+  instances: 1
+  memory: 128M
   routes:
   - route: nyu-recommendations-service-fall2021.us-south.cf.appdomain.cloud
   disk_quota: 1024M
@@ -13,3 +13,4 @@ applications:
   timeout: 180
   env:
     FLASK_APP : service:app
+    FLASK_DEBUG : false
