@@ -56,8 +56,11 @@ type = <Generic, BoughtTogether, CossSell, UpSell, Complementary>
     - if you're on a Windows PC, execute `vagrant up --provider virtualbox`
 4. After this, you will find a vm / docker container running on your system, inside which a docker container running
    postgres.
-5. To start the flask app, run `./scripts/start.sh` from the project directory. This will start the flask app on
-   port `5000` in the vm. 
+
+To start the flask app, 
+1. run `./scripts/start.sh` from the project directory. This will start the flask app on
+   port `5000` in the vm. OR,
+2. `vagrant ssh` into the VM; `cd /vagrant`and run `honcho start`
 
 - Server logs will be output in the same terminal window.
 - You can check that the service is up and running by executing `curl -X GET http://localhost:5000` from your local shell/terminal.
@@ -162,4 +165,26 @@ curl -X GET \
   -H 'cache-control: no-cache'
 ```
 
-## IBM Cloud
+
+#### Get a list of recommendations by Product ID, Recommendation Type, and/or Recommended Product ID
+
+- Endpoint - `GET /recommendations?product_id=${value}&type=${value}&rec_product_id=${value}`
+- Returns - return a list of recommendations matching query criteria
+- Command -
+
+```shell
+curl -X GET \
+  http://localhost:5000/recommendations?product_id=1 \
+  -H 'cache-control: no-cache'
+```
+
+#### Action Route - Increment Interested Counter
+- Endpoint - `PUT /recommendations/${id}/interested`
+- Returns - increments interested counter for the recommendation with given id
+- Command -
+
+```shell
+curl -X GET \
+  http://localhost:5000/recommendations/1/interested \
+  -H 'cache-control: no-cache'
+```
