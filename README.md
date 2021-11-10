@@ -180,7 +180,7 @@ curl -X GET \
 
 #### Action Route - Increment Interested Counter
 - Endpoint - `PUT /recommendations/${id}/interested`
-- Returns - increments interested counter for the recommendation with given id
+- Returns - recommendation with given id after it's `interested` attribute is incremented
 - Command -
 
 ```shell
