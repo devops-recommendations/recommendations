@@ -40,7 +40,7 @@ Vagrantfile                 - sample Vagrant file that installs Python 3 and Pos
 
 This section documents the different data models the service employs.  
 
-####1. Recommendation
+#### 1. Recommendation
 ```text
 id: Integer, primary key
 product_id: Integer
@@ -162,3 +162,5 @@ curl -X GET \
   http://localhost:5000/recommendations \
   -H 'cache-control: no-cache'
 ```
+
+## IBM Cloud
