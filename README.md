@@ -9,6 +9,12 @@
 This is the repository that houses the recommendations service that is part of the NYU class **CSCI-GA.2810-001: DevOps
 and Agile Methodologies**
 
+## Demo on IBM Cloud
+
+Service URL: https://nyu-recommendations-service-fall2021.us-south.cf.appdomain.cloud/
+
+We use ElephantSQL to host our PostgresSQL database.
+
 ## Project Structure
 
 This section explains the general repository structure.
@@ -61,7 +67,6 @@ To start the flask app,
 1. run `./scripts/start.sh` from the project directory. This will start the flask app on
    port `5000` in the vm. OR,
 2. `vagrant ssh` into the VM; `cd /vagrant`and run `honcho start`
-
 - Server logs will be output in the same terminal window.
 - You can check that the service is up and running by executing `curl -X GET http://localhost:5000` from your local shell/terminal.
 
@@ -79,6 +84,10 @@ cd /vagrant && nosetests
 
 This will generate a coverage and test success report.
 
+or
+
+Fire requests to our IBM Cloud Demo URL
+
 ## Service Endpoints
 
 #### Get service information
@@ -89,7 +98,7 @@ This will generate a coverage and test success report.
 
 ```shell
 curl -X GET \
-  http://localhost:5000/ \
+  <service-url> \
   -H 'cache-control: no-cache'
 ```
 
