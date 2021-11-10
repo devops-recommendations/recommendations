@@ -1,9 +1,8 @@
+![Build](https://github.com/devops-recommendations/recommendations/actions/workflows/workflow.yml/badge.svg)[![codecov](https://codecov.io/gh/devops-recommendations/recommendations/branch/main/graph/badge.svg?token=O4GINXC92T)](https://codecov.io/gh/devops-recommendations/recommendations)
+
+
+
 # Recommendations service.
-
-[![codecov](https://codecov.io/gh/devops-recommendations/recommendations/branch/main/graph/badge.svg?token=O4GINXC92T)](https://codecov.io/gh/devops-recommendations/recommendations)
-
-![Build](https://github.com/devops-recommendations/recommendations/actions/workflows/workflow.yml/badge.svg)
-
 
 ## Overview
 
