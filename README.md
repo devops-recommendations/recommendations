@@ -1,14 +1,19 @@
+![Build](https://github.com/devops-recommendations/recommendations/actions/workflows/workflow.yml/badge.svg)[![codecov](https://codecov.io/gh/devops-recommendations/recommendations/branch/main/graph/badge.svg?token=O4GINXC92T)](https://codecov.io/gh/devops-recommendations/recommendations)
+
+
+
 # Recommendations service.
-
-[![codecov](https://codecov.io/gh/devops-recommendations/recommendations/branch/main/graph/badge.svg?token=O4GINXC92T)](https://codecov.io/gh/devops-recommendations/recommendations)
-
-![Build](https://github.com/devops-recommendations/recommendations/actions/workflows/workflow.yml/badge.svg)
-
 
 ## Overview
 
 This is the repository that houses the recommendations service that is part of the NYU class **CSCI-GA.2810-001: DevOps
 and Agile Methodologies**
+
+## Demo on IBM Cloud
+
+Service URL: https://nyu-recommendations-service-fall2021.us-south.cf.appdomain.cloud/
+
+We use ElephantSQL to host our PostgresSQL database.
 
 ## Project Structure
 
@@ -40,7 +45,7 @@ Vagrantfile                 - sample Vagrant file that installs Python 3 and Pos
 
 This section documents the different data models the service employs.  
 
-####1. Recommendation
+#### 1. Recommendation
 ```text
 id: Integer, primary key
 product_id: Integer
@@ -57,9 +62,11 @@ type = <Generic, BoughtTogether, CossSell, UpSell, Complementary>
     - if you're on a Windows PC, execute `vagrant up --provider virtualbox`
 4. After this, you will find a vm / docker container running on your system, inside which a docker container running
    postgres.
-5. To start the flask app, run `./scripts/start.sh` from the project directory. This will start the flask app on
-   port `5000` in the vm. 
 
+To start the flask app, 
+1. run `./scripts/start.sh` from the project directory. This will start the flask app on
+   port `5000` in the vm. OR,
+2. `vagrant ssh` into the VM; `cd /vagrant`and run `honcho start`
 - Server logs will be output in the same terminal window.
 - You can check that the service is up and running by executing `curl -X GET http://localhost:5000` from your local shell/terminal.
 
@@ -77,6 +84,10 @@ cd /vagrant && nosetests
 
 This will generate a coverage and test success report.
 
+or
+
+Fire requests to our IBM Cloud Demo URL
+
 ## Service Endpoints
 
 #### Get service information
@@ -87,7 +98,7 @@ This will generate a coverage and test success report.
 
 ```shell
 curl -X GET \
-  http://localhost:5000/ \
+  <service-url> \
   -H 'cache-control: no-cache'
 ```
 
@@ -160,5 +171,29 @@ curl -X DELETE \
 ```shell
 curl -X GET \
   http://localhost:5000/recommendations \
+  -H 'cache-control: no-cache'
+```
+
+
+#### Get a list of recommendations by Product ID, Recommendation Type, and/or Recommended Product ID
+
+- Endpoint - `GET /recommendations?product_id=${value}&type=${value}&rec_product_id=${value}`
+- Returns - return a list of recommendations matching query criteria
+- Command -
+
+```shell
+curl -X GET \
+  http://localhost:5000/recommendations?product_id=1 \
+  -H 'cache-control: no-cache'
+```
+
+#### Action Route - Increment Interested Counter
+- Endpoint - `PUT /recommendations/${id}/interested`
+- Returns - recommendation with given id after it's `interested` attribute is incremented
+- Command -
+
+```shell
+curl -X GET \
+  http://localhost:5000/recommendations/1/interested \
   -H 'cache-control: no-cache'
 ```
