@@ -11,6 +11,7 @@ import os
 import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask_restx import Api, Resource, fields, reqparse, inputs
 from . import status  # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 
@@ -21,6 +22,15 @@ from service.models import Recommendation, DataValidationError
 
 # Import Flask application
 from . import app
+
+
+######################################################################
+# Configure the Root route before OpenAPI
+######################################################################
+@app.route('/')
+def index():
+    """ Index page """
+    return app.send_static_file('index.html')
 
 
 ######################################################################
