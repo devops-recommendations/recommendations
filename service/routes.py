@@ -46,7 +46,7 @@ api = Api(app)
 
 # Define the model so that the docs reflect what can be sent
 recommendation_model = api.model('RecommendationModel', {
-    '_id': fields.Integer(readOnly=True,
+    'id': fields.Integer(readOnly=True,
                 decription="The unique id assigned internally by service"),
     'product_id': fields.Integer(required=True,
                 description='The name of the Recommendation'),
@@ -86,30 +86,6 @@ def list_recommendations():
                for recommendation in recommendations]
     app.logger.info("Returning %d recommendations", len(results))
     return make_response(jsonify(results), status.HTTP_200_OK)
-
-######################################################################
-# CREATE A RECOMMENDATION
-######################################################################
-
-@app.route("/recommendations", methods=["POST"])
-def create_recommendation():
-    """
-    Creates a Recommendation
-    This endpoint will create a Recommendation based the data in the body that is posted
-    """
-    app.logger.info("Request to create a recommendation")
-    check_content_type("application/json")
-    recommendation = Recommendation()
-    recommendation.deserialize(request.get_json())
-    recommendation.create()
-    message = recommendation.serialize()
-    location_url = url_for("list_recommendations",
-                           id=recommendation.id, _external=True)
-
-    app.logger.info("Recommendation with ID [%s] created.", recommendation.id)
-    return make_response(
-        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-    )
 
 ######################################################################
 #  PATH: /recommendations/{id}
@@ -165,24 +141,51 @@ class RecommendationResource(Resource):
         recommendation.update()
         return recommendation.serialize(), status.HTTP_200_OK
 
+    #------------------------------------------------------------------
+    # DELETE A RECOMMENDATION
+    #------------------------------------------------------------------
+    @api.response(204, 'Recommendation deleted')
+    def delete(self, id):
+        """
+        Delete a Recommendation
+        This endpoint will delete a Recommendation based the id specified in the path
+        """
+        app.logger.info('Request to Delete a recommendation with id [%s]', id)
+        recommendation = Recommendation.find(id)
+        if recommendation:
+            recommendation.delete()
+            app.logger.info('Recommendation with id [%s] was deleted', id)
+
+        return '', status.HTTP_204_NO_CONTENT
+
 ######################################################################
-# DELETE A RECOMMENDATION
+#  PATH: /recommendations
 ######################################################################
+@api.route('/recommendations', strict_slashes=False)
+class RecommendationCollection(Resource):
+    """ Handles all interactions with collections of Recommendations """
 
+    #------------------------------------------------------------------
+    # ADD A NEW RECOMMENDATION
+    #------------------------------------------------------------------
+    @api.response(400, 'The posted data was not valid')
+    @api.expect(recommendation_model)
+    @api.marshal_with(recommendation_model, code=201)
+    def post(self):
+        """
+        Creates a Recommendation
+        This endpoint will create a Recommendation based the data in the body that is posted
+        """
+        app.logger.info('Request to Create a Recommendation')
+        check_content_type("application/json")
+        recommendation = Recommendation()
+        app.logger.debug('Payload = %s', api.payload)
+        recommendation.deserialize(api.payload)
+        recommendation.create()
+        app.logger.info('Recommendation with new id [%s] created!', recommendation.id)
+        location_url = api.url_for(RecommendationResource, id=recommendation.id, _external=True)
+        return recommendation.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
 
-@app.route("/recommendations/<int:id>", methods=["DELETE"])
-def delete_recommendations(id):
-    """
-    Delete a single Recommendation
-    This endpoint will delete a Recommendation based the id specified in the path
-    """
-    app.logger.info("Request to delete recommendation with id: %s", id)
-    recommendation = Recommendation.find(id)
-    if recommendation:
-        recommendation.delete()
-
-    app.logger.info("Recommendation with ID [%s] delete complete.", id)
-    return make_response("", status.HTTP_204_NO_CONTENT)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

@@ -119,13 +119,13 @@ class TestYourResourceServer(unittest.TestCase):
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_rec = resp.get_json()
-        self.assertEqual(new_rec[0]['product_id'],
+        self.assertEqual(new_rec['product_id'],
                          test_rec.product_id, "product_id do not match")
         self.assertEqual(
-            new_rec[0]["rec_product_id"], test_rec.rec_product_id, "Rec_prod do not match"
+            new_rec["rec_product_id"], test_rec.rec_product_id, "Rec_prod do not match"
         )
         self.assertEqual(
-            new_rec[0]["type"], test_rec.type.name, "Type does not match"
+            new_rec["type"], test_rec.type.name, "Type does not match"
         )
 
     def test_get_recommendation(self):
