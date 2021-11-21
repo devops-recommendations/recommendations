@@ -88,30 +88,6 @@ def list_recommendations():
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
-# CREATE A RECOMMENDATION
-######################################################################
-
-@app.route("/recommendations", methods=["POST"])
-def create_recommendation():
-    """
-    Creates a Recommendation
-    This endpoint will create a Recommendation based the data in the body that is posted
-    """
-    app.logger.info("Request to create a recommendation")
-    check_content_type("application/json")
-    recommendation = Recommendation()
-    recommendation.deserialize(request.get_json())
-    recommendation.create()
-    message = recommendation.serialize()
-    location_url = url_for("list_recommendations",
-                           id=recommendation.id, _external=True)
-
-    app.logger.info("Recommendation with ID [%s] created.", recommendation.id)
-    return make_response(
-        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-    )
-
-######################################################################
 #  PATH: /recommendations/{id}
 ######################################################################
 @api.route('/recommendations/<int:id>')
@@ -181,6 +157,33 @@ class RecommendationResource(Resource):
             app.logger.info('Recommendation with id [%s] was deleted', id)
 
         return '', status.HTTP_204_NO_CONTENT
+
+######################################################################
+#  PATH: /recommendations
+######################################################################
+@api.route('/recommendations', strict_slashes=False)
+class RecommendationCollection(Resource):
+    """ Handles all interactions with collections of Recommendations """
+
+    #------------------------------------------------------------------
+    # ADD A NEW RECOMMENDATION
+    #------------------------------------------------------------------
+    @api.response(400, 'The posted data was not valid')
+    @api.expect(recommendation_model)
+    @api.marshal_with(recommendation_model, code=201)
+    def post(self):
+        """
+        Creates a Recommendation
+        This endpoint will create a Recommendation based the data in the body that is posted
+        """
+        app.logger.info('Request to Create a Recommendation')
+        recommendation = Recommendation()
+        app.logger.debug('Payload = %s', api.payload)
+        recommendation.deserialize(api.payload)
+        recommendation.create()
+        app.logger.info('Recommendation with new id [%s] created!', recommendation.id)
+        location_url = api.url_for(RecommendationResource, id=recommendation.id, _external=True)
+        return recommendation.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
 
 
 ######################################################################
