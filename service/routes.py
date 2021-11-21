@@ -142,6 +142,29 @@ class RecommendationResource(Resource):
         app.logger.info("Returning recommendation: %s", recommendation.id)
         return recommendation.serialize(), status.HTTP_200_OK
 
+    #------------------------------------------------------------------
+    # UPDATE AN EXISTING Recommendation
+    #------------------------------------------------------------------
+    @api.response(404, 'Recommendation not found')
+    @api.response(400, 'The posted recommndation data was not valid')
+    @api.expect(recommendation_model)
+    @api.marshal_with(recommendation_model)
+    def put(self, id):
+        """
+        Update a recommendation
+        This endpoint will update a recommendation based the body that is posted
+        """
+        app.logger.info('Request to Update a recommendation with id [%s]', id)
+        recommendation = Recommendation.find(id)
+        if not recommendation:
+            abort(status.HTTP_404_NOT_FOUND, "Recommendation with id '{}' was not found.".format(id))
+        app.logger.debug('Payload = %s', api.payload)
+        data = api.payload
+        recommendation.deserialize(data)
+        recommendation.id = id
+        recommendation.update()
+        return recommendation.serialize(), status.HTTP_200_OK
+
 ######################################################################
 # DELETE A RECOMMENDATION
 ######################################################################
@@ -160,31 +183,6 @@ def delete_recommendations(id):
 
     app.logger.info("Recommendation with ID [%s] delete complete.", id)
     return make_response("", status.HTTP_204_NO_CONTENT)
-
-######################################################################
-# UPDATE AN EXISTING RECOMMENDATION
-######################################################################
-
-
-@app.route("/recommendations/<int:id>", methods=["PUT"])
-def update_recommendations(id):
-    """
-    Update a Recommendation
-    This endpoint will update a Recommendation based the body that is posted
-    """
-    app.logger.info("Request to update recommendations with id: %s", id)
-    check_content_type("application/json")
-    recommendation = Recommendation.find(id)
-    if not recommendation:
-        raise NotFound(
-            "Recommendation with id '{}' was not found.".format(id))
-    recommendation.deserialize(request.get_json())
-    recommendation.id = id
-    recommendation.update()
-
-    app.logger.info("Recommendation with ID [%s] updated.", recommendation.id)
-    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
-
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
