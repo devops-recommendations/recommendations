@@ -112,17 +112,17 @@ def create_recommendation():
     )
 
 ######################################################################
-#  PATH: /pets/{id}
+#  PATH: /recommendations/{id}
 ######################################################################
 @api.route('/recommendations/<int:id>')
-@api.param('id', 'The Pet identifier')
+@api.param('id', 'Recommendation identifier')
 class RecommendationResource(Resource):
     """
-    PetResource class
-    Allows the manipulation of a single Pet
-    GET /pet{id} - Returns a Pet with the id
-    PUT /pet{id} - Update a Pet with the id
-    DELETE /pet{id} -  Deletes a Pet with the id
+    RecommendationResource class
+    Allows the manipulation of a single Recommendation
+    GET /{id} - Returns a recommendation with the id
+    PUT /{id} - Update a recommendation with the id
+    DELETE /{id} -  Deletes a recommendation with the id
     """
 
     #------------------------------------------------------------------
