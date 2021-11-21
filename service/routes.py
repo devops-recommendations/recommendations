@@ -33,8 +33,7 @@ def index():
         jsonify(
             name="Recommendation REST API Service",
             version="1.0",
-            description="The recommendations resource can be used to get a product recommendation based on another product.",
-            paths=url_for("list_recommendations", _external=True),
+            description="The recommendations resource can be used to get a product recommendation based on another product."
         ),
         status.HTTP_200_OK,
     )
@@ -57,35 +56,6 @@ recommendation_model = api.model('RecommendationModel', {
     'interested': fields.Integer(required=False,
                 description='Interested counter for each recommendation')
 })
-
-######################################################################
-# LIST ALL RECOMMENDATIONS & QUERY RECOMMENDATIONS
-######################################################################
-
-
-@app.route("/recommendations", methods=["GET"])
-def list_recommendations():
-    """Returns all of the Recommendations for all products"""
-
-    app.logger.info("Request for recommendations list")
-    recommendations = []
-    product_id = request.args.get('product_id')
-    rec_product_id = request.args.get("rec_product_id")
-    rec_type = request.args.get("type")
-
-    if product_id or rec_product_id or rec_type:
-        recommendations = Recommendation.find_rec_by_filter(
-            product_id=product_id,
-            rec_product_id=rec_product_id,
-            type=rec_type
-        )
-    else:
-        recommendations = Recommendation.all()
-
-    results = [recommendation.serialize()
-               for recommendation in recommendations]
-    app.logger.info("Returning %d recommendations", len(results))
-    return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 #  PATH: /recommendations/{id}
@@ -166,10 +136,36 @@ class RecommendationCollection(Resource):
     """ Handles all interactions with collections of Recommendations """
 
     #------------------------------------------------------------------
+    # LIST ALL RECOMMENDATION
+    #------------------------------------------------------------------
+    @api.doc('list_recommendations')
+    @api.marshal_list_with(recommendation_model)
+    def get(self):
+        """ Returns all of the Recommendations """
+        app.logger.info('Request to list Recommendations...')
+        recommendations = []
+        product_id = request.args.get('product_id')
+        rec_product_id = request.args.get("rec_product_id")
+        rec_type = request.args.get("type")
+
+        if product_id or rec_product_id or rec_type:
+            recommendations = Recommendation.find_rec_by_filter(
+                product_id=product_id,
+                rec_product_id=rec_product_id,
+                type=rec_type
+            )
+        else:
+            recommendations = Recommendation.all()
+
+        results = [recommendation.serialize()
+                for recommendation in recommendations]
+        app.logger.info("Returning %d recommendations", len(results))
+        return results, status.HTTP_200_OK
+
+    #------------------------------------------------------------------
     # ADD A NEW RECOMMENDATION
     #------------------------------------------------------------------
     @api.response(400, 'The posted data was not valid')
-    @api.expect(recommendation_model)
     @api.marshal_with(recommendation_model, code=201)
     def post(self):
         """
