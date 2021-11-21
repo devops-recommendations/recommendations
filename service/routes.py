@@ -46,7 +46,7 @@ api = Api(app)
 
 # Define the model so that the docs reflect what can be sent
 recommendation_model = api.model('RecommendationModel', {
-    '_id': fields.Integer(readOnly=True,
+    'id': fields.Integer(readOnly=True,
                 decription="The unique id assigned internally by service"),
     'product_id': fields.Integer(required=True,
                 description='The name of the Recommendation'),
@@ -177,6 +177,7 @@ class RecommendationCollection(Resource):
         This endpoint will create a Recommendation based the data in the body that is posted
         """
         app.logger.info('Request to Create a Recommendation')
+        check_content_type("application/json")
         recommendation = Recommendation()
         app.logger.debug('Payload = %s', api.payload)
         recommendation.deserialize(api.payload)
