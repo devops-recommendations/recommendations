@@ -50,9 +50,10 @@ $(function () {
         var type = $("#type").val();
 
         var data = {
-            "product_id": prodcut_id,
-            "rec_product_id": rec_product_id,
-            "type": type
+            "product_id": parseInt(prodcut_id),
+            "rec_product_id": parseInt(rec_product_id),
+            "type": type,
+            "interested": 0
         };
 
         var ajax = $.ajax({
@@ -83,11 +84,13 @@ $(function () {
         var product_id = $("#product_id").val();
         var rec_product_id = $("#rec_product_id").val();
         var type = $("#type").val();
+        var interested = $("#interested").val();
 
         var data = {
-            "product_id": product_id,
-            "rec_product_id": rec_product_id,
-            "type": type
+            "product_id": parseInt(product_id),
+            "rec_product_id": parseInt(rec_product_id),
+            "type": type,
+            "interested": parseInt(interested)
         };
 
         var ajax = $.ajax({
@@ -98,6 +101,7 @@ $(function () {
             })
 
         ajax.done(function(res){
+            $("#id").val(id);
             update_form_data(res)
             flash_message("Success")
         });
@@ -171,7 +175,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "PUT",
-            url: "/recommendations/" + id,
+            url: "/recommendations/" + id + "/interested",
             contentType: "application/json",
             data: ''
         })
@@ -197,7 +201,7 @@ $(function () {
 
     $("#clear-btn").click(function () {
         $("#id").val("");
-        clear_form_data()
+        clear_form_data();
     });
 
     // ****************************************
@@ -244,7 +248,7 @@ $(function () {
             var header = '<tr>'
             header += '<th style="width:10%">ID</th>'
             header += '<th style="width:20%">Product ID</th>'
-            header += '<th style="width:30%">Recommendation Product ID</th>'
+            header += '<th style="width:30%">Rec Product ID</th>'
             header += '<th style="width:20%">Type</th>'
             header += '<th style="width:20%">Interested Count</th></tr>'
 
@@ -252,7 +256,7 @@ $(function () {
             var firstRecommendation = "";
             for(var i = 0; i < res.length; i++) {
                 var recommendation = res[i];
-                var row = "<tr><td>"+recommendation.id+"</td><td>"+recommendation.product_id+"</td><td>"+recommendation.rec_product_id+"</td><td>"+recommendation.type+"</td></tr>"recommendation.interested+"</td></tr>";
+                var row = "<tr><td>"+recommendation.id+"</td><td>"+recommendation.product_id+"</td><td>"+recommendation.rec_product_id+"</td><td>"+recommendation.type+"</td><td>"+recommendation.interested+"</td></tr>";
                 $("#search_results").append(row);
                 if (i == 0) {
                     firstRecommendation = recommendation;

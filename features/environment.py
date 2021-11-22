@@ -6,7 +6,7 @@ from selenium import webdriver
 
 WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
 BASE_URL = getenv(
-    'BASE_URL', 'https://nyu-recommendations-service-fall2021.us-south.cf.appdomain.cloud')
+    'BASE_URL', 'http://localhost:5000')
 
 
 def before_all(context):

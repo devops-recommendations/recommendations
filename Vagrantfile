@@ -8,6 +8,7 @@ Vagrant.configure(2) do |config|
 
   # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 5984, host: 5984, host_ip: "127.0.0.1"
   config.vm.network "private_network", ip: "192.168.33.10"
 
   # Windows users need to change the permission of files and directories
@@ -74,8 +75,11 @@ Vagrant.configure(2) do |config|
     echo "****************************************"
     # Install Python 3 and dev tools 
     apt-get update
-    apt-get install -y git tree wget vim python3-dev python3-pip python3-venv apt-transport-https
-    apt-get upgrade python3
+    apt-get install -y git tree wget vim jq python3-dev python3-pip python3-venv apt-transport-https python3-selenium
+    apt-get -y autoremove
+
+    # Install Chromium Driver
+    apt-get install -y chromium-driver
     
     # Need PostgreSQL development library to compile on arm64
     apt-get install -y libpq-dev

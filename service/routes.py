@@ -27,17 +27,18 @@ from . import app, status
 ######################################################################
 @app.route("/")
 def index():
-    """Root URL response"""
-    app.logger.info("Request for Root URL")
-    return (
-        jsonify(
-            name="Recommendation REST API Service",
-            version="1.0",
-            description="The recommendations resource can be used to get a product recommendation based on another product.",
-            paths=url_for("list_recommendations", _external=True),
-        ),
-        status.HTTP_200_OK,
-    )
+    # """Root URL response"""
+    # app.logger.info("Request for Root URL")
+    # return (
+    #     jsonify(
+    #         name="Recommendation REST API Service",
+    #         version="1.0",
+    #         description="The recommendations resource can be used to get a product recommendation based on another product.",
+    #         paths=url_for("list_recommendations", _external=True),
+    #     ),
+    #     status.HTTP_200_OK,
+    # )
+    return app.send_static_file('index.html')
 
 # ######################################################################
 # # Configure Swagger before initializing it
@@ -46,7 +47,7 @@ api = Api(app)
 
 # Define the model so that the docs reflect what can be sent
 recommendation_model = api.model('RecommendationModel', {
-    '_id': fields.Integer(readOnly=True,
+    'id': fields.Integer(readOnly=True,
                 decription="The unique id assigned internally by service"),
     'product_id': fields.Integer(required=True,
                 description='The name of the Recommendation'),
