@@ -33,5 +33,18 @@ Feature: The recommendations service back-end
         And I should see "40" in the "Rec_Product_ID" field
         And I should see "UpSell" in the "Type" dropdown
 
+    Scenario: List all recommendations
+        When I visit the "Home Page"
+        And I press the "Search" button
+        Then I should see "13" in the results
+        And I should see "16" in the results
+        And I should not see "21" in the results
 
+    Scenario: Search all product with Rec_Product_ID "3"
+        When I visit the "Home Page"
+        And I set the "Rec_Product_ID" to "3"
+        And I press the "Search" button
+        Then I should see "13" in the results
+        And I should not see "16" in the results
+        And I should not see "21" in the results
 
