@@ -48,3 +48,38 @@ Feature: The recommendations service back-end
         And I should not see "16" in the results
         And I should not see "21" in the results
 
+    Scenario: Update a Recommendation
+        When I visit the "Home Page"
+        And I set the "Product_ID" to "13"
+        And I press the "Search" button
+        Then I should see "13" in the "Product_ID" field
+        And I should see "3" in the "Rec_Product_ID" field
+        When I change "Product_ID" to "88"
+        And I press the "Update" button
+        Then I should see the message "Success"
+        When I copy the "ID" field
+        And I press the "Clear" button
+        And I paste the "ID" field
+        And I press the "Retrieve" button
+        Then I should see "88" in the "Product_ID" field
+        When I press the "Clear" button
+        And I press the "Search" button
+        Then I should see "88" in the results
+        Then I should not see "13" in the results
+
+    Scenario: Delete a Recommendation
+        When I visit the "Home Page"
+        And I set the "Product_ID" to "16"
+        And I press the "Delete" button
+        And I press the "Clear" button
+        And I press the "Search" button
+        Then I should not see "16" in the results
+
+    Scenario: Increase the Interested Count of a Recommendation
+        When I visit the "Home Page"
+        And I set the "product_id" to "21"
+        And I copy the "ID" field
+        And I press the "Clear" button
+        And I paste the "ID" field
+        And I press the "Intrested" button
+        Then I should see "13" in the "Interested" field
