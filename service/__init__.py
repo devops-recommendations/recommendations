@@ -8,6 +8,7 @@ import logging
 
 from flask import Flask
 import sys
+from service import log_handlers
 
 # Create Flask application
 app = Flask(__name__)
@@ -26,6 +27,8 @@ if __name__ != "__main__":
     # for handler in app.logger.handlers:
     #     handler.setFormatter(formatter)
     app.logger.info("Logging handler established")
+
+log_handlers.init_logging(app, "gunicorn.error")
 
 app.logger.info(70 * "*")
 app.logger.info("=====   RECOMMENDATION SERVICE   =====".center(70, "*"))
