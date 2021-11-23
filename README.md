@@ -79,14 +79,22 @@ vagrant up
 
 vagrant ssh 
 
-cd /vagrant && nosetests
+cd /vagrant
+```
+
+To run backend tests use:
+```shell
+nosetests
 ```
 
 This will generate a coverage and test success report.
 
-or
 
-Fire requests to our IBM Cloud Demo URL
+To run UI tests with behave
+```shell
+honcho start &
+behave
+```
 
 ## Service Endpoints
 
