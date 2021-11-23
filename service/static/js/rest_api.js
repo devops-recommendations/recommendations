@@ -101,7 +101,6 @@ $(function () {
             })
 
         ajax.done(function(res){
-            $("#id").val(id);
             update_form_data(res)
             flash_message("Success")
         });
@@ -157,7 +156,7 @@ $(function () {
 
         ajax.done(function(res){
             clear_form_data()
-            flash_message("Pet has been Deleted!")
+            flash_message("Recommendation has been Deleted!")
         });
 
         ajax.fail(function(res){
