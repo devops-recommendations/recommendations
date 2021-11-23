@@ -267,6 +267,13 @@ class TestYourResourceServer(unittest.TestCase):
         for recommendation in data:
             self.assertEqual(recommendation["rec_product_id"], test_rec_product_id)
 
+    def test_delete_all(self):
+        """ Delete all recommendations"""
+        self._create_recommendations(10)
+        resp = self.app.delete(BASE_URL)
+
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
     def test_method_405(self):
         """ Method not allowed 405 """
         resp = self.app.post(
