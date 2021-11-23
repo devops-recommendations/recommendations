@@ -32,11 +32,12 @@ def init_db(app):
     """Initialies the SQLAlchemy app"""
     Recommendation.init_db(app)
 
+class DatabaseConnectionError(Exception):
+    """Custom Exception when database connection fails"""
+
 
 class DataValidationError(Exception):
-    """Used for an data validation errors when deserializing"""
-
-    pass
+    """Custom Exception with data validation fails"""
 
 
 class RecommendationType(Enum):
@@ -169,6 +170,11 @@ class Recommendation(db.Model):
         """Returns all of the Recommendation in the database"""
         logger.info("Processing all Recommendations")
         return cls.query.all()
+
+    @classmethod
+    def remove_all(cls):
+        """Removes all documents from the database (use for testing)"""
+        cls.query.delete()
 
     @classmethod
     def find(cls, id: int):

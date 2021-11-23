@@ -140,7 +140,6 @@ class RecommendationCollection(Resource):
     #------------------------------------------------------------------
     # LIST ALL RECOMMENDATION
     #------------------------------------------------------------------
-    @api.doc('list_recommendations')
     @api.marshal_list_with(recommendation_model)
     def get(self):
         """ Returns all of the Recommendations """
@@ -184,6 +183,52 @@ class RecommendationCollection(Resource):
         location_url = api.url_for(RecommendationResource, id=recommendation.id, _external=True)
         return recommendation.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
 
+    #------------------------------------------------------------------
+    # DELETE ALL RECOMMENDATIONS (for testing only)
+    #------------------------------------------------------------------
+    @api.response(204, 'All Recommendations deleted')
+    def delete(self):
+        """
+        Delete all Recommendation
+        This endpoint will delete all Recommendation only if the system is under test
+        """
+        app.logger.info('Request to Delete all recommendations...')
+        if "TESTING" in app.config and app.config["TESTING"]:
+            Recommendation.remove_all()
+            app.logger.info("Removed all Recommendations from the database")
+        else:
+            app.logger.warning("Request to clear database while system not under test")
+
+        return '', status.HTTP_204_NO_CONTENT
+
+######################################################################
+#  PATH: /recommendations/{id}/interested
+######################################################################
+@api.route('/recommendations/<id>/interested')
+@api.param('id', 'The Recommendation identifier')
+class InterestedResource(Resource):
+    """ Action on a Recommendation """
+    @api.response(404, 'Recommendation not found')
+    @api.response(409, 'The Recommendation is not available to increment interested')
+    def put(self, id):
+        """
+        Increment a recommendation's interesed field
+        This endpoint will increment the interested counter by one when interested button is clicked
+        """
+        app.logger.info(
+            'Increment intrested field for recommendation with id: %s', id)
+        check_content_type('application/json')
+        recommendation = Recommendation.find(id)
+        if not recommendation:
+            raise NotFound(
+                "Recommendation with id '{}' was not found.".format(id))
+        recommendation.interested += 1
+        recommendation.update()
+
+        app.logger.info(
+            "Interested count with recommendation ID [%s] updated.", recommendation.id)
+        return recommendation.serialize(), status.HTTP_200_OK
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
@@ -200,29 +245,3 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         "Content-Type must be {}".format(media_type),
     )
-
-######################################################################
-#  Increment Interested Counter
-######################################################################
-
-
-@app.route('/recommendations/<int:id>/interested', methods=["PUT"])
-def increment_interested_counter(id):
-    """
-    Increment a recommendation's interesed field
-    This endpoint will increment the interested counter by one when interested button is clicked
-    """
-    app.logger.info(
-        'Increment intrested field for recommendation with id: %s', id)
-    check_content_type('application/json')
-    recommendation = Recommendation.find(id)
-    if not recommendation:
-        raise NotFound(
-            "Recommendation with id '{}' was not found.".format(id))
-    recommendation.interested += 1
-    recommendation.update()
-
-    app.logger.info(
-        "Interested count with recommendation ID [%s] updated.", recommendation.id)
-
-    return make_response(jsonify(recommendation.serialize()), status.HTTP_200_OK)
