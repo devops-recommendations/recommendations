@@ -39,25 +39,43 @@ def index():
     #     status.HTTP_200_OK,
     # )
     return app.send_static_file('index.html')
-  
+
+
 # ######################################################################
 # # Configure Swagger before initializing it
 # ######################################################################
-api = Api(app)
+api = Api(
+    app,
+    version='1.0.0',
+    title='Recommendations REST API Service',
+    description='This is a sample server for the recommendation service.',
+    default='recommendation',
+    default_label='Recommendation Management',
+    doc='/apidocs'
+)
 
-# Define the model so that the docs reflect what can be sent
-recommendation_model = api.model('RecommendationModel', {
-    'id': fields.Integer(readOnly=True,
-                decription="The unique id assigned internally by service"),
-    'product_id': fields.Integer(required=True,
-                description='The name of the Recommendation'),
-    'rec_product_id': fields.Integer(required=True,
-                description='ID of the recommended product'),
-    'type': fields.String(required=True,
-                description='Type of the recommendation (Generic, BoughtTogether, CossSell, UpSell, Complementary)'),
-    'interested': fields.Integer(required=False,
-                description='Interested counter for each recommendation')
-})
+
+# Model definition starts
+create_recommendation_model = api.model(
+    'RecommendationBaseModel', {
+        'product_id': fields.Integer(required=True,
+                                     description='The name of the Recommendation'),
+        'rec_product_id': fields.Integer(required=True,
+                                         description='ID of the recommended product'),
+        'type': fields.String(required=True,
+                              description='Type of the recommendation (Generic, BoughtTogether, CossSell, UpSell, '
+                                          'Complementary)'),
+        'interested': fields.Integer(required=False,
+                                     description='Interested counter for each recommendation')
+    })
+
+recommendation_model = api.inherit(
+    'RecommendationModel',
+    create_recommendation_model,
+    {'id': fields.Integer(readOnly=True,
+                          decription="The unique id assigned internally by service")}
+)
+# Model definition ends
 
 ######################################################################
 #  PATH: /recommendations/{id}
@@ -95,8 +113,8 @@ class RecommendationResource(Resource):
     #------------------------------------------------------------------
     @api.response(404, 'Recommendation not found')
     @api.response(400, 'The posted recommndation data was not valid')
-    @api.expect(recommendation_model)
-    @api.marshal_with(recommendation_model)
+    @api.expect(create_recommendation_model)
+    @api.marshal_with(create_recommendation_model)
     def put(self, id):
         """
         Update a recommendation
@@ -167,8 +185,9 @@ class RecommendationCollection(Resource):
     #------------------------------------------------------------------
     # ADD A NEW RECOMMENDATION
     #------------------------------------------------------------------
+    @api.expect(create_recommendation_model)
     @api.response(400, 'The posted data was not valid')
-    @api.marshal_with(recommendation_model, code=201)
+    @api.marshal_with(create_recommendation_model, code=201)
     def post(self):
         """
         Creates a Recommendation
