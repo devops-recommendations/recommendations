@@ -7,37 +7,22 @@ GET / - Root Resource
 GET /recommendations - Return a list of all recommendations for all products
 POST /recommendation - Add a recommendation for products
 """
-import os
-import sys
-import logging
-from flask import Flask, jsonify, request, url_for, make_response, abort
-from flask_restx import Api, Resource, fields, reqparse, inputs
-from werkzeug.exceptions import NotFound, default_exceptions
+from flask import request, abort
+from flask_restx import Api, Resource, fields
+from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
-from flask_sqlalchemy import SQLAlchemy
-from service.models import Recommendation, DataValidationError
-
+from service.models import Recommendation
 # Import Flask application
 from . import app, status
+
 
 ######################################################################
 # GET INDEX
 ######################################################################
 @app.route("/")
 def index():
-    # """Root URL response"""
-    # app.logger.info("Request for Root URL")
-    # return (
-    #     jsonify(
-    #         name="Recommendation REST API Service",
-    #         version="1.0",
-    #         description="The recommendations resource can be used to get a product recommendation based on another product.",
-    #         paths=url_for("list_recommendations", _external=True),
-    #     ),
-    #     status.HTTP_200_OK,
-    # )
     return app.send_static_file('index.html')
 
 
@@ -54,16 +39,15 @@ api = Api(
     doc='/apidocs'
 )
 
-
 # Model definition starts
 create_recommendation_model = api.model(
-    'RecommendationBaseModel', {
+    'CreateRecommendationModel', {
         'product_id': fields.Integer(required=True,
                                      description='The name of the Recommendation'),
         'rec_product_id': fields.Integer(required=True,
                                          description='ID of the recommended product'),
         'type': fields.String(required=True,
-                              description='Type of the recommendation (Generic, BoughtTogether, CossSell, UpSell, '
+                              description='Type of the recommendation (Generic, BoughtTogether, CrossSell, UpSell, '
                                           'Complementary)'),
         'interested': fields.Integer(required=False,
                                      description='Interested counter for each recommendation')
@@ -75,6 +59,8 @@ recommendation_model = api.inherit(
     {'id': fields.Integer(readOnly=True,
                           decription="The unique id assigned internally by service")}
 )
+
+
 # Model definition ends
 
 ######################################################################
@@ -91,9 +77,9 @@ class RecommendationResource(Resource):
     DELETE /{id} -  Deletes a recommendation with the id
     """
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # RETRIEVE A Recommendation
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.response(404, 'Recommendation not found')
     @api.marshal_with(recommendation_model)
     def get(self, id):
@@ -108,9 +94,9 @@ class RecommendationResource(Resource):
         app.logger.info("Returning recommendation: %s", recommendation.id)
         return recommendation.serialize(), status.HTTP_200_OK
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # UPDATE AN EXISTING Recommendation
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.response(404, 'Recommendation not found')
     @api.response(400, 'The posted recommndation data was not valid')
     @api.expect(create_recommendation_model)
@@ -131,9 +117,9 @@ class RecommendationResource(Resource):
         recommendation.update()
         return recommendation.serialize(), status.HTTP_200_OK
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # DELETE A RECOMMENDATION
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.response(204, 'Recommendation deleted')
     def delete(self, id):
         """
@@ -148,6 +134,7 @@ class RecommendationResource(Resource):
 
         return '', status.HTTP_204_NO_CONTENT
 
+
 ######################################################################
 #  PATH: /recommendations
 ######################################################################
@@ -155,9 +142,9 @@ class RecommendationResource(Resource):
 class RecommendationCollection(Resource):
     """ Handles all interactions with collections of Recommendations """
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # LIST ALL RECOMMENDATION
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.marshal_list_with(recommendation_model)
     def get(self):
         """ Returns all of the Recommendations """
@@ -177,13 +164,13 @@ class RecommendationCollection(Resource):
             recommendations = Recommendation.all()
 
         results = [recommendation.serialize()
-                for recommendation in recommendations]
+                   for recommendation in recommendations]
         app.logger.info("Returning %d recommendations", len(results))
         return results, status.HTTP_200_OK
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # ADD A NEW RECOMMENDATION
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.expect(create_recommendation_model)
     @api.response(400, 'The posted data was not valid')
     @api.marshal_with(create_recommendation_model, code=201)
@@ -202,9 +189,9 @@ class RecommendationCollection(Resource):
         location_url = api.url_for(RecommendationResource, id=recommendation.id, _external=True)
         return recommendation.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # DELETE ALL RECOMMENDATIONS (for testing only)
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.response(204, 'All Recommendations deleted')
     def delete(self):
         """
@@ -220,6 +207,7 @@ class RecommendationCollection(Resource):
 
         return '', status.HTTP_204_NO_CONTENT
 
+
 ######################################################################
 #  PATH: /recommendations/{id}/interested
 ######################################################################
@@ -227,6 +215,7 @@ class RecommendationCollection(Resource):
 @api.param('id', 'The Recommendation identifier')
 class InterestedResource(Resource):
     """ Action on a Recommendation """
+
     @api.response(404, 'Recommendation not found')
     @api.response(409, 'The Recommendation is not available to increment interested')
     def put(self, id):
