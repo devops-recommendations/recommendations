@@ -100,7 +100,7 @@ class RecommendationResource(Resource):
     @api.response(404, 'Recommendation not found')
     @api.response(400, 'The posted recommndation data was not valid')
     @api.expect(create_recommendation_model)
-    @api.marshal_with(create_recommendation_model)
+    @api.marshal_with(recommendation_model)
     def put(self, id):
         """
         Update a recommendation
@@ -173,7 +173,7 @@ class RecommendationCollection(Resource):
     # ------------------------------------------------------------------
     @api.expect(create_recommendation_model)
     @api.response(400, 'The posted data was not valid')
-    @api.marshal_with(create_recommendation_model, code=201)
+    @api.marshal_with(recommendation_model, code=201)
     def post(self):
         """
         Creates a Recommendation
