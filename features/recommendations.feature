@@ -81,8 +81,7 @@ Feature: The recommendations service back-end
         When I visit the "Home Page"
         And I set the "product_id" to "2100"
         And I press the "Search" button
-        And I copy the "ID" field
-        And I press the "Clear" button
-        And I paste the "ID" field
-        And I press the "Interested" button
+        Then I should see the message "Success"
+        When I press the "Interested" button
         Then I should see the message "Updated Interested Count!"
+        And I should see "161" in the "Interested" field
