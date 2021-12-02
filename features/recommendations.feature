@@ -75,9 +75,7 @@ Feature: The recommendations service back-end
         And I press the "Clear" button
         And I paste the "ID" field
         And I press the "Delete" button
-        And I press the "Clear" button
-        And I press the "Search" button
-        Then I should not see "2100" in the results
+        Then I should see the message "Recommendation has been Deleted!"
 
     Scenario: Increase the Interested Count of a Recommendation
         When I visit the "Home Page"
@@ -87,4 +85,4 @@ Feature: The recommendations service back-end
         And I press the "Clear" button
         And I paste the "ID" field
         And I press the "Interested" button
-        Then I should see "161" in the "Interested" field
+        Then I should see the message "Updated Interested Count!"
