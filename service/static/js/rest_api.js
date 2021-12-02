@@ -182,7 +182,7 @@ $(function () {
         ajax.done(function(res){
             //alert(res.toSource())
             update_form_data(res)
-            flash_message("Success")
+            flash_message("Updated Interested Count!")
         });
 
         ajax.fail(function(res){
