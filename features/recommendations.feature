@@ -76,6 +76,7 @@ Feature: The recommendations service back-end
         And I paste the "ID" field
         And I press the "Delete" button
         And I press the "Clear" button
+        And I set the "Product_ID" to "2100"
         And I press the "Search" button
         Then I should not see "2100" in the results
 
