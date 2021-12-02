@@ -169,7 +169,7 @@ $(function () {
     // ****************************************
 
     $("#interested-btn").click(function () {
-
+        $("#flash_message").empty();
         var id = $("#id").val();
 
         var ajax = $.ajax({
