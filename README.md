@@ -11,7 +11,8 @@ and Agile Methodologies**
 
 ## Demo on IBM Cloud
 
-Service URL: https://nyu-recommendations-service-fall2021.us-south.cf.appdomain.cloud/
+Dev - https://nyu-recommendations-service-fall2021.us-south.cf.appdomain.cloud/
+Prod - https://prod-nyu-recommendations-service-fall2021.us-south.cf.appdomain.cloud/
 
 We use ElephantSQL to host our PostgresSQL database.
 
